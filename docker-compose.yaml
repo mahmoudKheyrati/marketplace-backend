@@ -29,24 +29,24 @@ services:
     restart: unless-stopped
 
   pgadmin:
-      container_name: pgadmin_container
-      image: dpage/pgadmin4
-      env_file:
-        - .env
-      volumes:
-        - pgadmin:/var/lib/pgadmin
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    env_file:
+      - .env
+    volumes:
+      - pgadmin:/var/lib/pgadmin
 
-      ports:
-        - "5050:80"
-      networks:
-        - postgres
-      restart: unless-stopped
+    ports:
+      - "5050:80"
+    networks:
+      - postgres
+    restart: unless-stopped
 
 networks:
-    postgres:
-      driver: bridge
+  postgres:
+    driver: bridge
 
 volumes:
-    postgres:
-    pgadmin:
+  postgres:
+  pgadmin:
 
