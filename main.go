@@ -15,6 +15,7 @@ import (
 )
 
 func main() {
+	ctx := context.Background()
 	zapLogger := pkg.NewLogger()
 	defer func(logger *zap.SugaredLogger) {
 		err := zapLogger.Sync()
@@ -24,13 +25,25 @@ func main() {
 	}(zapLogger) // flush logs if any
 
 	cfg := config.NewConfig()
+	db := pkg.CreateNewPostgresConnection(pkg.PostgresConfig{
+		Host:          cfg.Postgres.Host,
+		Port:          cfg.Postgres.Port,
+		Username:      cfg.Postgres.Username,
+		Password:      cfg.Postgres.Password,
+		Database:      cfg.Postgres.Database,
+		MaxConnection: cfg.Postgres.MaxConnection,
+	})
+	defer func(db *pgx.Conn, ctx context.Context) {
+		err := db.Close(ctx)
+		if err != nil {
+			pkg.Log.Fatal(err)
+		}
+	}(db, ctx)
 
 	app := fiber.New()
 	app.Use(recover.New())
 	app.Use(cors.New())
 	app.Use(logger.New())
-
-	_, _ = pgx.Connect(context.Background(), "")
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
