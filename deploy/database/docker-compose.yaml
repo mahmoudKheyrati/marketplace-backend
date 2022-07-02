@@ -20,14 +20,14 @@ services:
     ports:
       - '5501:5432'
     depends_on:
-      - postgresql-master
+      - marketplace-postgresql-master
     environment:
       - POSTGRESQL_REPLICATION_MODE=slave
       - POSTGRESQL_REPLICATION_USER=repl_user
       - POSTGRESQL_REPLICATION_PASSWORD=repl_password
-      - POSTGRESQL_MASTER_HOST=postgresql-master
+      - POSTGRESQL_MASTER_HOST=marketplace-postgresql-master
       - POSTGRESQL_PASSWORD=password
-      - POSTGRESQL_MASTER_PORT_NUMBER=5500
+      - POSTGRESQL_MASTER_PORT_NUMBER=5432
       - ALLOW_EMPTY_PASSWORD=yes
 
 volumes:
