@@ -4,7 +4,7 @@ create table "user" -- login with email and password
 (
     id           bigserial primary key,
     email        text not null unique,
-    password     text,
+    password     text not null,
     phone_number text not null unique,
     first_name   text,
     last_name    text,
