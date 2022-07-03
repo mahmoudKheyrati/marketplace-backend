@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package com.marketplace.v1;
+
+message LoginRequest{
+  string email = 1 ;
+  string password = 2;
+}
+
+message LoginResponse{
+  message Result{
+    string token = 1 ;
+    string expiration_date = 2;
+  }
+  message Error {
+    string error = 1 ;
+  }
+  oneof response{
+    Result result = 1;
+    Error error = 2;
+  }
+}
+
+message SignUpRequest{
+  string email = 1 ;
+  string password = 2;
+  string first_name = 3 ;
+  string last_name = 4;
+  string phone_number = 5;
+}
+
+message SignUpResponse{
+  message Result{
+    string token = 1 ;
+    string expiration_date = 2;
+  }
+  message Error {
+    string error = 1 ;
+  }
+  oneof response{
+    Result result = 1;
+    Error error = 2;
+  }
+}
+
+service AuthService {
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc SignUp(SignUpRequest) returns (SignUpResponse);
+}
+
