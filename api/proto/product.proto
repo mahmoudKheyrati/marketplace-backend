@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package com.marketplace.v1;
+
+
+
+service ProductService{
+  rpc GetHomePageProducts() returns ();
+  rpc GetProductsByCategory() returns () ;
+
+  rpc GetSubCategoriesByCategoryId() returns () ;
+  rpc GetParentsCategoriesByCategoryId() returns () ;
+
+  rpc GetProductDetail () returns ();
+
+  rpc AddProduct () returns () ;
+  rpc Search () returns () ;
+
+}
