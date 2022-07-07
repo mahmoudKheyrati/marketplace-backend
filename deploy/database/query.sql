@@ -389,7 +389,9 @@ values (?, ?, ?);
 -- delete promotion_code
 update promotion_code set deleted_at = now() where id= ?;
 
-
+-- create new order
+insert into "order"(user_id, address_id, product_id, store_id, shipping_method_id, applied_promotion_code)
+values (?, ?, ?, ?,?);
 
 
 
