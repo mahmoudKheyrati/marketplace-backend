@@ -484,5 +484,9 @@ from ticket where user_id = ? order by created_at desc ;
 select id, user_id, employee_id, ticket_type_id, is_done, done_at, created_at
 from ticket where user_id = ? ;
 
+-- make chat done!
+update ticket set is_done = true, done_at = now() where id = ? and employee_id= ? ;
+
+
 
 
