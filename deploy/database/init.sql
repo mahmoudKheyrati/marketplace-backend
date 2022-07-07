@@ -3,8 +3,7 @@
 drop table if exists user_permission cascade;
 create table user_permission
 (
-    id                           bigserial primary key,
-    name                         text not null unique,
+    name                         text primary key ,
     is_system_admin              bool default false,
     system_read_access           bool default false,
     system_edit_access_product   bool default false,
@@ -28,7 +27,7 @@ create table "user" -- login with email and password
     last_name    text,
     avatar_url   text,
     national_id  text,
-    permission   bigint references user_permission (id) on delete set null on update cascade,
+    permission_name   text references user_permission (name) on delete set null on update cascade,
     created_at   timestamptz default now()
 );
 
