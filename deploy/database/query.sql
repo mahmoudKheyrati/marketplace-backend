@@ -288,4 +288,15 @@ with recursive cte as (
     union
     select c.id, c.name, c.parent from category c join cte ct on ct.parent = c.id
 ) select id, name from cte;
+-- subscribe to product availability
+insert into product_available_subscription(product_id, user_id)
+values (?, ?);
+-- send notification of product availability to user
+begin ;
+delete from product_available_subscription where user_id = ? and product_id = ? ;
+insert into notification(user_id, product_id) values (?,?);
+commit ;
+-- get all products that user subscribed on
+select product_id, user_id, created_at, is_notification_sent
+from product_available_subscription where user_id = ? ;
 
