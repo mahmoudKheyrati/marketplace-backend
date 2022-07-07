@@ -300,3 +300,22 @@ commit ;
 select product_id, user_id, created_at, is_notification_sent
 from product_available_subscription where user_id = ? ;
 
+-- create review
+insert into review (product_id, store_id, user_id, rate, review_text)
+values (?,?,?,?,?);
+-- todo: check if user by a product from store.
+-- update review
+update review set rate=? and review_text= ? where id = ? and user_id=? and deleted_at is null;
+-- get user all reviews
+select id, product_id, store_id, user_id, rate, review_text, created_at
+from review where user_id = ? and deleted_at is null;
+-- delete review
+update review
+set deleted_at = now()
+where id = ? and user_id= ? and deleted_at is null;
+
+
+
+
+
+
