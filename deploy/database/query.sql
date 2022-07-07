@@ -280,4 +280,12 @@ insert into warranty(name, type, month) values (?,?,?);
 -- delete warranty by warranty_id
 delete from warranty where id = ? ;
 
+-- get product category
+with recursive cte as (
+    select c.id, c.name, c.parent
+    from product  p join category c on p.category_id = c.id
+    where p.id = 3
+    union
+    select c.id, c.name, c.parent from category c join cte ct on ct.parent = c.id
+) select id, name from cte;
 
