@@ -275,5 +275,9 @@ from store_product where product_id = ?
 select id, name, type, month, created_at
 from warranty where id = ? ;
 
+-- add warranty
+insert into warranty(name, type, month) values (?,?,?);
+-- delete warranty by warranty_id
+delete from warranty where id = ? ;
 
 
