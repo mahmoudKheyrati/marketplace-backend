@@ -383,8 +383,11 @@ select * from review
 where product_id = ? and deleted_at is null
 order by created_at desc;
 
-
-
+-- add promotion_code
+insert into promotion_code(id,percent, max_off_price)
+values (?, ?, ?);
+-- delete promotion_code
+update promotion_code set deleted_at = now() where id= ?;
 
 
 
