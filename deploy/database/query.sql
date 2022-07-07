@@ -256,7 +256,8 @@ select id,
        description,
        picture_url,
        specification
-from product where id = ? ;
+from product
+where id = ?;
 
 -- get all store-products that have this product
 select product_id,
@@ -268,51 +269,117 @@ select product_id,
        warranty_id,
        created_at,
        is_last_version
-from store_product where product_id = ?
-                     and available_count > 0 ;
+from store_product
+where product_id = ?
+  and available_count > 0;
 
 -- get product warranty by warranty id
 select id, name, type, month, created_at
-from warranty where id = ? ;
+from warranty
+where id = ?;
 
 -- add warranty
-insert into warranty(name, type, month) values (?,?,?);
+insert into warranty(name, type, month)
+values (?, ?, ?);
 -- delete warranty by warranty_id
-delete from warranty where id = ? ;
+delete
+from warranty
+where id = ?;
 
 -- get product category
 with recursive cte as (
     select c.id, c.name, c.parent
-    from product  p join category c on p.category_id = c.id
+    from product p
+             join category c on p.category_id = c.id
     where p.id = 3
     union
-    select c.id, c.name, c.parent from category c join cte ct on ct.parent = c.id
-) select id, name from cte;
+    select c.id, c.name, c.parent
+    from category c
+             join cte ct on ct.parent = c.id
+)
+select id, name
+from cte;
 -- subscribe to product availability
 insert into product_available_subscription(product_id, user_id)
 values (?, ?);
 -- send notification of product availability to user
-begin ;
-delete from product_available_subscription where user_id = ? and product_id = ? ;
-insert into notification(user_id, product_id) values (?,?);
-commit ;
+begin;
+delete
+from product_available_subscription
+where user_id = ?
+  and product_id = ?;
+insert into notification(user_id, product_id)
+values (?, ?);
+commit;
 -- get all products that user subscribed on
 select product_id, user_id, created_at, is_notification_sent
-from product_available_subscription where user_id = ? ;
+from product_available_subscription
+where user_id = ?;
 
 -- create review
 insert into review (product_id, store_id, user_id, rate, review_text)
-values (?,?,?,?,?);
+values (?, ?, ?, ?, ?);
 -- todo: check if user by a product from store.
 -- update review
-update review set rate=? and review_text= ? where id = ? and user_id=? and deleted_at is null;
+update review
+set rate=? and review_text = ?
+where id = ?
+  and user_id=?
+  and deleted_at is null;
 -- get user all reviews
 select id, product_id, store_id, user_id, rate, review_text, created_at
-from review where user_id = ? and deleted_at is null;
+from review
+where user_id = ?
+  and deleted_at is null;
 -- delete review
 update review
 set deleted_at = now()
-where id = ? and user_id= ? and deleted_at is null;
+where id = ?
+  and user_id = ?
+  and deleted_at is null;
+
+-- create votes
+insert into votes (review_id, user_id, up_vote, down_vote)
+values (?, ?, ?, ?);
+-- delete vote
+delete
+from votes
+where user_id = ?
+  and review_id = ?;
+
+-- sort reviews by votes count
+with cte as (
+select r.id,
+       r.product_id,
+       r.store_id,
+       r.user_id,
+       r.rate,
+       r.review_text,
+       r.created_at,
+       sum (case when v.up_vote=true then 1 else 0 end) as up_votes,
+       sum (case when v.down_vote=true then 1 else 0 end) as down_votes
+from review r
+         join votes v on r.id = v.review_id
+group by r.id, r.product_id, r.store_id, r.user_id, r.rate, r.review_text, r.created_at
+
+)
+select id,
+       product_id,
+       store_id,
+       user_id,
+       rate,
+       review_text,
+       created_at,
+       up_votes,
+       down_votes
+from cte
+where product_id = ?
+order by up_votes* 2 + down_votes desc;
+
+
+
+
+
 
 
 
