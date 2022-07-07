@@ -356,6 +356,7 @@ select r.id,
        r.rate,
        r.review_text,
        r.created_at,
+       r.deleted_at,
        sum (case when v.up_vote=true then 1 else 0 end) as up_votes,
        sum (case when v.down_vote=true then 1 else 0 end) as down_votes
 from review r
@@ -373,11 +374,14 @@ select id,
        up_votes,
        down_votes
 from cte
-where product_id = ?
+where product_id = ? and deleted_at is null
 order by up_votes* 2 + down_votes desc;
 
 
-
+-- sort reviews by created date
+select * from review
+where product_id = ? and deleted_at is null
+order by created_at desc;
 
 
 
