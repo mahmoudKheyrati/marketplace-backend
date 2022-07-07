@@ -254,7 +254,7 @@ create table ticket
     user_id        bigint                 not null references "user" (id) on update cascade,
     employee_id    bigint      default -1 not null references "user" (id) on update cascade,
     ticket_type_id bigint                 not null references ticket_type (id) on update cascade,
-    is_done        bool,
+    is_done        bool default false,
     done_at        timestamptz,
     created_at     timestamptz default now()
 
