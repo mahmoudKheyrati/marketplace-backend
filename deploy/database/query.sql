@@ -271,5 +271,9 @@ select product_id,
 from store_product where product_id = ?
                      and available_count > 0 ;
 
+-- get product warranty by warranty id
+select id, name, type, month, created_at
+from warranty where id = ? ;
+
 
 
