@@ -475,5 +475,14 @@ select id, name, description
 from ticket_type where is_last_version = true;
 
 -- create new ticket
+insert into ticket(user_id, ticket_type_id)
+values (?, ?);
+-- get user all tickets
+select id, user_id, employee_id, ticket_type_id, is_done, done_at, created_at
+from ticket where user_id = ? order by created_at desc ;
+-- filter user tickets by ticket_type
+select id, user_id, employee_id, ticket_type_id, is_done, done_at, created_at
+from ticket where user_id = ? ;
+
 
 
