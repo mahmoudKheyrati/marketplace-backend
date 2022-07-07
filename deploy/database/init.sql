@@ -4,13 +4,16 @@ drop table if exists user_permission cascade;
 create table user_permission
 (
     id                           bigserial primary key,
-    name                         text unique,
-    is_system_admin              bool,
-    system_read_access           bool,
-    system_edit_access_product   bool,
-    system_create_access_product bool,
-    system_create_new_store      bool,
-    is_employee                  bool,
+    name                         text not null unique,
+    is_system_admin              bool default false,
+    system_read_access           bool default false,
+    system_edit_access_product   bool default false,
+    system_create_access_product bool default false,
+    system_create_new_store      bool default false,
+    store_create_new_product     bool default false,
+    store_read_new_product       bool default false,
+    store_edit_new_product       bool default false,
+    is_employee                  bool default false,
     created_at                   timestamptz default now()
 );
 
@@ -29,7 +32,7 @@ create table "user" -- login with email and password
     created_at   timestamptz default now()
 );
 
-drop table if exists address cascade ;
+drop table if exists address cascade;
 create table address
 (
     id                bigserial primary key,
@@ -44,7 +47,7 @@ create table address
     created_at        timestamptz default now()
 );
 
-drop table if exists shipping_method cascade ;
+drop table if exists shipping_method cascade;
 create table shipping_method
 (
     id                            serial primary key,
@@ -174,7 +177,7 @@ create table votes
         )
 );
 
-drop table if exists promotion_code cascade ;
+drop table if exists promotion_code cascade;
 create table promotion_code
 (
     id            text primary key,
@@ -200,7 +203,7 @@ create table "order"
 );
 
 --------------------- support and tracking system ---------------------------
-drop table if exists ticket_type cascade ;
+drop table if exists ticket_type cascade;
 create table ticket_type
 (
     id              bigserial primary key,
@@ -209,7 +212,7 @@ create table ticket_type
     is_last_version bool        default true,
     created_at      timestamptz default now()
 );
-drop table if exists ticket;
+drop table if exists ticket cascade ;
 create table ticket
 (
     id             bigserial primary key,
@@ -221,7 +224,7 @@ create table ticket
     created_at     timestamptz default now()
 
 );
-drop table if exists ticket_message cascade ;
+drop table if exists ticket_message cascade;
 create table ticket_message
 (
     ticket_id    bigint not null references ticket (id) on update cascade,
