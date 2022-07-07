@@ -130,8 +130,9 @@ set country     =?,
     postal_code = ?
 where store_id = ?;
 
-
-
+-- insert store category
+insert into store_category(category_id, store_id)  values (? , ?);
+delete from store_category where category_id =? and store_id = ?;
 
 
 
