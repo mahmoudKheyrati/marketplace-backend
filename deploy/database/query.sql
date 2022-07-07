@@ -51,3 +51,12 @@ values (?, ?, ?, ?, ?, ?, ?);
 commit;
 
 
+-- shipping method
+insert into shipping_method (name, expected_arrival_working_days, base_cost)
+values ('ordinary', 7, 15),
+       ('express', 3, 35),
+       ('special', 1, 50);
+-- get all shipping method
+select name, expected_arrival_working_days, base_cost, created_at
+from shipping_method;
+
