@@ -171,7 +171,8 @@ create table review
     user_id     bigint           not null references "user" (id) on delete cascade on update cascade,
     rate        double precision not null check ( rate between 0 and 5),
     review_text text,
-    created_at  timestamptz default now()
+    created_at  timestamptz default now(),
+    deleted_at  timestamptz
 );
 
 drop table if exists votes;
