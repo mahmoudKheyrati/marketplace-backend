@@ -459,4 +459,21 @@ insert into payment(order_id, user_id, total_price) values (?,?,?);
 commit ;
 
 
+-- crate ticket-types
+-- todo: insert some types
+insert into ticket_type(name, description)
+values ('', '');
+-- update ticket-types
+begin;
+update ticket_type set is_last_version = false where id = ?;
+insert into ticket_type(name, description) values (?, ?);
+commit ;
+-- delete ticket_type
+update ticket_type set is_last_version = false where id = ?;
+-- get all ticket types
+select id, name, description
+from ticket_type where is_last_version = true;
+
+-- create new ticket
+
 
