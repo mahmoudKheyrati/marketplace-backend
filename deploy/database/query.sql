@@ -113,6 +113,26 @@ where id = ?
   and creator = ?;
 
 
+-- add address for store
+
+insert into store_address (country, province, city, street, postal_code)
+values (?, ?, ?, ?, ?);
+-- get store addresses
+select store_id, country, province, city, street, postal_code, created_at
+from store_address
+where store_id = ?;
+-- update store address
+update store_address
+set country     =?,
+    province=?,
+    city= ?,
+    street= ?,
+    postal_code = ?
+where store_id = ?;
+
+
+
+
 
 
 
