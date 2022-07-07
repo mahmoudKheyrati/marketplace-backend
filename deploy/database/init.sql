@@ -1,5 +1,20 @@
 -- when a product state change to available state, users that interest in that product will be notified.
 ---------------------- marketplace ------------------------------------------
+drop table if exists user_permission;
+create table user_permission
+(
+    id                           bigserial primary key,
+    name                         text unique,
+    is_system_admin              bool,
+    system_read_access           bool,
+    system_edit_access_product   bool,
+    system_create_access_product bool,
+    system_create_new_store      bool,
+    is_employee                  bool,
+    created_at                   timestamptz default now()
+);
+
+drop table if exists "user";
 create table "user" -- login with email and password
 (
     id           bigserial primary key,
@@ -14,19 +29,7 @@ create table "user" -- login with email and password
     created_at   timestamptz default now()
 );
 
-create table user_permission
-(
-    id                           bigserial primary key,
-    name                         text unique,
-    is_system_admin              bool,
-    system_read_access           bool,
-    system_edit_access_product   bool,
-    system_create_access_product bool,
-    system_create_new_store      bool,
-    is_employee                  bool,
-    created_at                   timestamptz default now()
-);
-
+drop table if exists address;
 create table address
 (
     id                bigserial primary key,
@@ -41,6 +44,7 @@ create table address
     created_at        timestamptz default now()
 );
 
+drop table if exists shipping_method;
 create table shipping_method
 (
     id                            serial primary key,
@@ -51,6 +55,7 @@ create table shipping_method
 );
 
 
+drop table if exists category;
 create table category
 (
     id         bigserial primary key,
@@ -60,6 +65,7 @@ create table category
 );
 
 
+drop table if exists store;
 create table store
 (
     id          bigserial primary key,
@@ -71,6 +77,7 @@ create table store
     created_at  timestamptz default now()
 ); -- a user can have a store or multiple store?; each store can have multiple products and can available them.
 
+drop table if exists store_address;
 create table store_address
 (
     store_id    bigint references "store" (id),
@@ -82,6 +89,7 @@ create table store_address
     created_at  timestamptz default now()
 );
 
+drop table if exists store_category;
 create table store_category
 (
     category_id bigint references category (id) on delete set null on update cascade,
@@ -90,6 +98,7 @@ create table store_category
 );
 
 
+drop table if exists product;
 create table product
 (
     id            bigserial primary key,
@@ -101,6 +110,7 @@ create table product
     specification jsonb
 );
 
+drop table if exists warranty;
 create table warranty
 (
     id         bigserial primary key,
@@ -109,6 +119,7 @@ create table warranty
     month      int,
     created_at timestamptz default now()
 );
+drop table if exists store_product;
 create table store_product
 (
     product_id      bigint           not null references product (id),
@@ -124,6 +135,7 @@ create table store_product
     constraint unique (product_id, store_id)
 );
 
+drop table if exists product_category;
 create table product_category
 (
     category_id bigint references category (id) on delete set null on update cascade,
@@ -131,6 +143,7 @@ create table product_category
     constraint unique (category_id, product_id)
 );
 
+drop table if exists product_available_subscription;
 create table product_available_subscription
 (
     product_id           bigint not null references product (id) on delete cascade on update cascade,
@@ -139,6 +152,7 @@ create table product_available_subscription
     is_notification_sent bool   not null default false,
     constraint unique (product_id, user_id)
 );
+drop table if exists review;
 create table review
 (
     id          bigserial primary key,
@@ -150,6 +164,7 @@ create table review
     created_at  timestamptz default now()
 );
 
+drop table if exists votes;
 create table votes
 (
     review_id bigint not null references review (id) on delete cascade on update cascade,
@@ -157,9 +172,10 @@ create table votes
     up_vote   bool,
     down_vote bool,
     check ( up_vote != votes.down_vote
-)
-    );
+        )
+);
 
+drop table if exists promotion_code;
 create table promotion_code
 (
     id            text primary key,
@@ -168,6 +184,7 @@ create table promotion_code
     created_at    timestamptz      default now()
 );
 
+drop table if exists "order";
 create table "order"
 (
     order_id               bigserial primary key,
@@ -183,6 +200,7 @@ create table "order"
 );
 
 --------------------- support and tracking system ---------------------------
+drop table if exists ticket_type;
 create table ticket_type
 (
     id              bigserial primary key,
@@ -191,6 +209,7 @@ create table ticket_type
     is_last_version bool        default true,
     created_at      timestamptz default now()
 );
+drop table if exists ticket;
 create table ticket
 (
     id             bigserial primary key,
@@ -202,6 +221,7 @@ create table ticket
     created_at     timestamptz default now()
 
 );
+drop table if exists ticket_message;
 create table ticket_message
 (
     ticket_id    bigint not null references ticket (id) on update cascade,
