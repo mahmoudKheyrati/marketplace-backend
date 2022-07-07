@@ -156,10 +156,11 @@ create table product_available_subscription
 );
 
 drop table if exists notification;
-create table notification( -- use this table as event log, for performance perspective we don't use foreign-key or unique constraint
-    user_id bigint,
+create table notification
+( -- use this table as event log, for performance perspective we don't use foreign-key or unique constraint
+    user_id    bigint,
     product_id bigint,
-    sent_at timestamptz default now()
+    sent_at    timestamptz default now()
 );
 
 drop table if exists review cascade;
@@ -192,7 +193,8 @@ create table promotion_code
     id            text primary key,
     percent       double precision default 0.0,
     max_off_price double precision default 0.0,
-    created_at    timestamptz      default now()
+    created_at    timestamptz      default now(),
+    deleted_at    timestamptz
 );
 
 drop table if exists "order";
@@ -208,6 +210,7 @@ create table "order"
     shipping_method_id     text   not null references shipping_method (name),
     applied_promotion_code text references promotion_code (id),
     is_paid                bool   not null default false,
+    is_canceled            bool   not null default false,
     created_at             timestamptz     default now()
 );
 
