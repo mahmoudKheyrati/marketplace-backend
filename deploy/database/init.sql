@@ -137,13 +137,13 @@ create table store_product
     unique (product_id, store_id)
 );
 
-drop table if exists product_category;
-create table product_category
-(
-    category_id bigint references category (id) on delete set null on update cascade,
-    product_id  bigint references product (id) on delete set null on update cascade,
-    unique (category_id, product_id)
-);
+-- drop table if exists product_category;
+-- create table product_category
+-- (
+--     category_id bigint references category (id) on delete set null on update cascade,
+--     product_id  bigint references product (id) on delete set null on update cascade,
+--     unique (category_id, product_id)
+-- );
 
 drop table if exists product_available_subscription;
 create table product_available_subscription
