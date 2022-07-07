@@ -22,4 +22,32 @@ where email = ?
 -- signup
 insert into "user" (email, password, phone_number, first_name, last_name, avatar_url, national_id, permission_name)
 values (?, ?, ?, ?, ?, '', '', 'normal-user');
+-- add address for user
+insert into address(user_id, country, province, city, street, postal_code, home_phone_number)
+values (?, ?, ?, ?, ?, ?, ?);
+-- get user addresses
+select id,
+       user_id,
+       country,
+       province,
+       city,
+       street,
+       postal_code,
+       home_phone_number,
+       is_last_version,
+       created_at
+from address
+where user_id = ?
+  and is_last_version = true;
+-- update user address
+begin;
+
+update address
+set is_last_version = false
+where id = ?;
+
+insert into address(user_id, country, province, city, street, postal_code, home_phone_number)
+values (?, ?, ?, ?, ?, ?, ?);
+commit;
+
 
