@@ -227,6 +227,15 @@ create table product_order
     unique (product_id, store_id)
 );
 
+drop table if exists payment;
+create table payment
+(
+    order_id    bigint,
+    user_id     bigint,
+    total_price bigint,
+    pay_at      timestamptz default now(),
+    unique (order_id, user_id)
+);
 
 --------------------- support and tracking system ---------------------------
 drop table if exists ticket_type cascade;
