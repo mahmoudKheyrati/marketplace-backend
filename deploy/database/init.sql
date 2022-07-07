@@ -49,8 +49,7 @@ create table address
 drop table if exists shipping_method cascade;
 create table shipping_method
 (
-    id                            serial primary key,
-    name                          text not null,
+    name                          text primary key ,
     expected_arrival_working_days int,
     base_cost                     int  not null,
     created_at                    timestamptz default now()
@@ -195,7 +194,7 @@ create table "order"
     address_id             bigint not null references address (id) on update cascade,
     product_id             bigint not null references product (id),
     store_id               bigint not null references store (id),
-    shipping_method_id     int    not null references shipping_method (id),
+    shipping_method_id     text    not null references shipping_method (name),
     applied_promotion_code text references promotion_code (id),
     is_paid                bool   not null default false,
     created_at             timestamptz     default now()
