@@ -131,10 +131,122 @@ set country     =?,
 where store_id = ?;
 
 -- insert store category
-insert into store_category(category_id, store_id)  values (? , ?);
-delete from store_category where category_id =? and store_id = ?;
+insert into store_category(category_id, store_id)
+values (?, ?);
 
+-- delete store category
+delete
+from store_category
+where category_id =?
+  and store_id = ?;
 
+-- add product
+insert into product (category_id, name, brand, description, picture_url, specification)
+values (?, ?, ?, ?, ?, ?);
 
+-- delete product
+delete
+from product
+where id = ?;
+
+-- select products by name
+select id, category_id, name, brand, description, picture_url, specification
+from product
+where name ilike '%?%';
+-- important
+-- select products by brand
+select id, category_id, name, brand, description, picture_url, specification
+from product
+where brand ilike '%?%';
+-- important
+-- select products by category
+-- todo: add recursive query to get sub categories
+select *
+from product
+where category_id in (
+    select id
+    from category
+    where category.name = ?
+);
+
+-- filter by brand
+select id, category_id, name, brand, description, picture_url, specification
+from product
+where category_id = ?
+  and brand in (?);
+-- filter by price
+select id, category_id, name, brand, description, picture_url, specification
+from product p
+         join store_product sp on p.id = sp.product_id
+where p.category_id = ?
+  and sp.price between ? and ?;
+
+-- filter by specification
+select id, category_id, name, brand, description, picture_url, specification
+from product
+where category_id = ?
+  and specification::jsonb ->> ? = ?;
+-- important
+
+-- get category specifications distinct
+select distinct (jsonb_object_keys(p.specification))
+from product p
+         join category c on p.category_id = c.id
+where p.category_id = ?;
+
+-- sort by price cheapest to most expensive
+select p.id,
+       p.category_id,
+       p.name,
+       p.brand,
+       p.description,
+       p.picture_url,
+       p.specification,
+       min(sp.price) as price
+from product p
+         join store_product sp on p.id = sp.product_id
+where p.category_id = ?
+group by p.id, p.category_id, p.name, p.brand, p.description, p.picture_url, p.specification
+order by min(sp.price);
+
+-- sort by price most expensive to cheapest
+select p.id,
+       p.category_id,
+       p.name,
+       p.brand,
+       p.description,
+       p.picture_url,
+       p.specification,
+       min(sp.price) as price
+from product p
+         join store_product sp on p.id = sp.product_id
+where p.category_id = ?
+group by p.id, p.category_id, p.name, p.brand, p.description, p.picture_url, p.specification
+order by min(sp.price) desc;
+-- sort by rating highest to lowest
+select p.id,
+       p.category_id,
+       p.name,
+       p.brand,
+       p.description,
+       p.picture_url,
+       p.specification,
+       avg(r.rate) as rate
+from product p
+         join review r on p.id = r.product_id
+where p.category_id = ?
+group by p.id, p.category_id, p.name, p.brand, p.description, p.picture_url, p.specification
+order by avg(r.rate) desc;
+-- sort by recently added
+select id,
+       category_id,
+       name,
+       brand,
+       description,
+       picture_url,
+       specification
+from product
+where category_id = ?
+order by created_at desc;
 
 
