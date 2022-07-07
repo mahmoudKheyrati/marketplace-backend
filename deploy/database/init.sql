@@ -3,32 +3,32 @@
 drop table if exists user_permission cascade;
 create table user_permission
 (
-    name                         text primary key ,
-    is_system_admin              bool default false,
-    system_read_access           bool default false,
-    system_edit_access_product   bool default false,
-    system_create_access_product bool default false,
-    system_create_new_store      bool default false,
-    store_create_new_product     bool default false,
-    store_read_new_product       bool default false,
-    store_edit_new_product       bool default false,
-    is_employee                  bool default false,
+    name                         text primary key,
+    is_system_admin              bool        default false,
+    system_read_access           bool        default false,
+    system_edit_access_product   bool        default false,
+    system_create_access_product bool        default false,
+    system_create_new_store      bool        default false,
+    store_create_new_product     bool        default false,
+    store_read_new_product       bool        default false,
+    store_edit_new_product       bool        default false,
+    is_employee                  bool        default false,
     created_at                   timestamptz default now()
 );
 
 drop table if exists "user" cascade;
 create table "user" -- login with email and password
 (
-    id           bigserial primary key,
-    email        text not null unique,
-    password     text not null,
-    phone_number text not null unique,
-    first_name   text,
-    last_name    text,
-    avatar_url   text,
-    national_id  text,
-    permission_name   text references user_permission (name) on delete set null on update cascade,
-    created_at   timestamptz default now()
+    id              bigserial primary key,
+    email           text not null unique,
+    password        text not null,
+    phone_number    text not null unique,
+    first_name      text,
+    last_name       text,
+    avatar_url      text,
+    national_id     text,
+    permission_name text references user_permission (name) on delete set null on update cascade,
+    created_at      timestamptz default now()
 );
 
 drop table if exists address cascade;
@@ -49,9 +49,9 @@ create table address
 drop table if exists shipping_method cascade;
 create table shipping_method
 (
-    name                          text primary key ,
+    name                          text primary key,
     expected_arrival_working_days int,
-    base_cost                     int  not null,
+    base_cost                     int not null,
     created_at                    timestamptz default now()
 );
 
@@ -60,7 +60,7 @@ drop table if exists category cascade;
 create table category
 (
     id         bigserial primary key,
-    name       text unique not null,
+    name       text not null,
     parent     bigint references category (id),
     created_at timestamptz default now()
 );
@@ -194,7 +194,7 @@ create table "order"
     address_id             bigint not null references address (id) on update cascade,
     product_id             bigint not null references product (id),
     store_id               bigint not null references store (id),
-    shipping_method_id     text    not null references shipping_method (name),
+    shipping_method_id     text   not null references shipping_method (name),
     applied_promotion_code text references promotion_code (id),
     is_paid                bool   not null default false,
     created_at             timestamptz     default now()
@@ -210,7 +210,7 @@ create table ticket_type
     is_last_version bool        default true,
     created_at      timestamptz default now()
 );
-drop table if exists ticket cascade ;
+drop table if exists ticket cascade;
 create table ticket
 (
     id             bigserial primary key,
