@@ -248,5 +248,28 @@ select id,
 from product
 where category_id = ?
 order by created_at desc;
+-- get product by product_id
+select id,
+       category_id,
+       name,
+       brand,
+       description,
+       picture_url,
+       specification
+from product where id = ? ;
+
+-- get all store-products that have this product
+select product_id,
+       store_id,
+       off_percent,
+       max_off_price,
+       price,
+       available_count,
+       warranty_id,
+       created_at,
+       is_last_version
+from store_product where product_id = ?
+                     and available_count > 0 ;
+
 
 
