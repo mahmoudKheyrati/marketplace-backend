@@ -37,7 +37,7 @@ create table address
     street            text,
     postal_code       text,
     home_phone_number text,
-    is_show           bool        default true,
+    is_last_version   bool        default true,
     created_at        timestamptz default now()
 );
 
@@ -119,7 +119,7 @@ create table store_product
     available_count int              not null default 0,
     warranty_id     bigint references warranty (id) on delete set null on update cascade,
     created_at      timestamptz               default now(),
-    is_show         bool                      default true,
+    is_last_version bool                      default true,
 
     constraint unique (product_id, store_id)
 );
@@ -156,7 +156,8 @@ create table votes
     user_id   bigint not null references "user" (id) on delete cascade on update cascade,
     up_vote   bool,
     down_vote bool,
-    check ( up_vote != votes.down_vote )
+    check ( up_vote != votes.down_vote
+)
     );
 
 create table promotion_code
@@ -177,17 +178,18 @@ create table "order"
     store_product_id       bigint not null references store_product on update cascade,
     shipping_method_id     int    not null references shipping_method (id),
     applied_promotion_code text references promotion_code (id),
+    is_paid                bool   not null default false,
     created_at             timestamptz     default now()
 );
 
 --------------------- support and tracking system ---------------------------
 create table ticket_type
 (
-    id          bigserial primary key,
-    name        text unique,
-    description text,
-    is_show     bool        default true,
-    created_at  timestamptz default now()
+    id              bigserial primary key,
+    name            text unique,
+    description     text,
+    is_last_version bool        default true,
+    created_at      timestamptz default now()
 );
 create table ticket
 (
