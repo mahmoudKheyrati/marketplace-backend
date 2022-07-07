@@ -154,6 +154,14 @@ create table product_available_subscription
     is_notification_sent bool   not null default false,
     unique (product_id, user_id)
 );
+
+drop table if exists notification;
+create table notification( -- use this table as event log, for performance perspective we don't use foreign-key or unique constraint
+    user_id bigint,
+    product_id bigint,
+    sent_at timestamptz default now()
+);
+
 drop table if exists review cascade;
 create table review
 (
