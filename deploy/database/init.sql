@@ -262,9 +262,10 @@ create table ticket
 drop table if exists ticket_message cascade;
 create table ticket_message
 (
+    id bigserial primary key ,
     ticket_id    bigint not null references ticket (id) on update cascade,
     sender_id    bigint not null references "user" (id),
-    message_text text,
-    status       text check ( status in ('sent', 'received', 'seen')),
+    message_text text not null ,
+    status       text default 'sent' check ( status in ('sent', 'received', 'seen')),
     created_at   timestamptz default now()
 );
