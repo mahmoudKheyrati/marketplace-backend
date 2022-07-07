@@ -242,7 +242,7 @@ drop table if exists ticket_type cascade;
 create table ticket_type
 (
     id              bigserial primary key,
-    name            text unique,
+    name            text,
     description     text,
     is_last_version bool        default true,
     created_at      timestamptz default now()
