@@ -1,6 +1,6 @@
 -- when a product state change to available state, users that interest in that product will be notified.
 ---------------------- marketplace ------------------------------------------
-drop table if exists user_permission cascade ;
+drop table if exists user_permission cascade;
 create table user_permission
 (
     id                           bigserial primary key,
@@ -14,7 +14,7 @@ create table user_permission
     created_at                   timestamptz default now()
 );
 
-drop table if exists "user" cascade ;
+drop table if exists "user" cascade;
 create table "user" -- login with email and password
 (
     id           bigserial primary key,
@@ -29,7 +29,7 @@ create table "user" -- login with email and password
     created_at   timestamptz default now()
 );
 
-drop table if exists address;
+drop table if exists address cascade ;
 create table address
 (
     id                bigserial primary key,
@@ -44,7 +44,7 @@ create table address
     created_at        timestamptz default now()
 );
 
-drop table if exists shipping_method;
+drop table if exists shipping_method cascade ;
 create table shipping_method
 (
     id                            serial primary key,
@@ -55,7 +55,7 @@ create table shipping_method
 );
 
 
-drop table if exists category;
+drop table if exists category cascade;
 create table category
 (
     id         bigserial primary key,
@@ -65,7 +65,7 @@ create table category
 );
 
 
-drop table if exists store cascade ;
+drop table if exists store cascade;
 create table store
 (
     id          bigserial primary key,
@@ -98,7 +98,7 @@ create table store_category
 );
 
 
-drop table if exists product;
+drop table if exists product cascade;
 create table product
 (
     id            bigserial primary key,
@@ -110,7 +110,7 @@ create table product
     specification jsonb
 );
 
-drop table if exists warranty;
+drop table if exists warranty cascade;
 create table warranty
 (
     id         bigserial primary key,
@@ -119,7 +119,7 @@ create table warranty
     month      int,
     created_at timestamptz default now()
 );
-drop table if exists store_product;
+drop table if exists store_product cascade;
 create table store_product
 (
     product_id      bigint           not null references product (id),
@@ -131,8 +131,7 @@ create table store_product
     warranty_id     bigint references warranty (id) on delete set null on update cascade,
     created_at      timestamptz               default now(),
     is_last_version bool                      default true,
-
-    constraint unique (product_id, store_id)
+    unique (product_id, store_id)
 );
 
 drop table if exists product_category;
@@ -140,7 +139,7 @@ create table product_category
 (
     category_id bigint references category (id) on delete set null on update cascade,
     product_id  bigint references product (id) on delete set null on update cascade,
-    constraint unique (category_id, product_id)
+    unique (category_id, product_id)
 );
 
 drop table if exists product_available_subscription;
@@ -150,16 +149,16 @@ create table product_available_subscription
     user_id              bigint not null references "user" (id) on delete cascade on update cascade,
     created_at           timestamptz     default now(),
     is_notification_sent bool   not null default false,
-    constraint unique (product_id, user_id)
+    unique (product_id, user_id)
 );
-drop table if exists review;
+drop table if exists review cascade;
 create table review
 (
     id          bigserial primary key,
     product_id  bigint           not null references product (id) on delete cascade on update cascade,
     store_id    bigint           not null references store (id) on delete cascade on update cascade,
     user_id     bigint           not null references "user" (id) on delete cascade on update cascade,
-    rate        double precision not null check ( value between 0 and 5),
+    rate        double precision not null check ( rate between 0 and 5),
     review_text text,
     created_at  timestamptz default now()
 );
@@ -175,7 +174,7 @@ create table votes
         )
 );
 
-drop table if exists promotion_code;
+drop table if exists promotion_code cascade ;
 create table promotion_code
 (
     id            text primary key,
@@ -188,11 +187,12 @@ drop table if exists "order";
 create table "order"
 (
     order_id               bigserial primary key,
-    status                 text   not null default 'confirmed' check ( value in ('confirmed', 'is-packing', 'packed', 'shipped')),
+    status                 text   not null default 'confirmed' check ( status in ('confirmed', 'is-packing', 'packed', 'shipped')),
     tracking_code          text            default 'not-set',
     user_id                bigint not null references "user" (id),
     address_id             bigint not null references address (id) on update cascade,
-    store_product_id       bigint not null references store_product on update cascade,
+    product_id             bigint not null references product (id),
+    store_id               bigint not null references store (id),
     shipping_method_id     int    not null references shipping_method (id),
     applied_promotion_code text references promotion_code (id),
     is_paid                bool   not null default false,
@@ -200,7 +200,7 @@ create table "order"
 );
 
 --------------------- support and tracking system ---------------------------
-drop table if exists ticket_type;
+drop table if exists ticket_type cascade ;
 create table ticket_type
 (
     id              bigserial primary key,
@@ -221,12 +221,12 @@ create table ticket
     created_at     timestamptz default now()
 
 );
-drop table if exists ticket_message;
+drop table if exists ticket_message cascade ;
 create table ticket_message
 (
     ticket_id    bigint not null references ticket (id) on update cascade,
     sender_id    bigint not null references "user" (id),
     message_text text,
-    status       text check ( value in ('sent', 'received', 'seen')),
+    status       text check ( status in ('sent', 'received', 'seen')),
     created_at   timestamptz default now()
 );
