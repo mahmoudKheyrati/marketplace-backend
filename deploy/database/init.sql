@@ -216,6 +216,18 @@ create table "order"
     created_at             timestamptz     default now()
 );
 
+drop table if exists product_order;
+create table product_order
+(
+    product_id bigint not null references product (id),
+    store_id   bigint not null references store (id),
+    order_id   bigint references "order" (order_id),
+    quantity   bigint      default 1,
+    created_at timestamptz default now(),
+    unique (product_id, store_id)
+);
+
+
 --------------------- support and tracking system ---------------------------
 drop table if exists ticket_type cascade;
 create table ticket_type
