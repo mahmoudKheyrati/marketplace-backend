@@ -108,7 +108,9 @@ create table product
     brand         text,
     description   text,
     picture_url   text,
-    specification jsonb
+    specification jsonb,
+    created_at    timestamptz default now()
+
 );
 
 drop table if exists warranty cascade;
