@@ -349,20 +349,19 @@ where user_id = ?
 
 -- sort reviews by votes count
 with cte as (
-select r.id,
-       r.product_id,
-       r.store_id,
-       r.user_id,
-       r.rate,
-       r.review_text,
-       r.created_at,
-       r.deleted_at,
-       sum (case when v.up_vote=true then 1 else 0 end) as up_votes,
-       sum (case when v.down_vote=true then 1 else 0 end) as down_votes
-from review r
-         join votes v on r.id = v.review_id
-group by r.id, r.product_id, r.store_id, r.user_id, r.rate, r.review_text, r.created_at
-
+    select r.id,
+           r.product_id,
+           r.store_id,
+           r.user_id,
+           r.rate,
+           r.review_text,
+           r.created_at,
+           r.deleted_at,
+           sum(case when v.up_vote = true then 1 else 0 end)   as up_votes,
+           sum(case when v.down_vote = true then 1 else 0 end) as down_votes
+    from review r
+             join votes v on r.id = v.review_id
+    group by r.id, r.product_id, r.store_id, r.user_id, r.rate, r.review_text, r.created_at
 )
 select id,
        product_id,
@@ -374,24 +373,90 @@ select id,
        up_votes,
        down_votes
 from cte
-where product_id = ? and deleted_at is null
-order by up_votes* 2 + down_votes desc;
+where product_id = ?
+  and deleted_at is null
+order by up_votes * 2 + down_votes desc;
 
 
 -- sort reviews by created date
-select * from review
-where product_id = ? and deleted_at is null
+select *
+from review
+where product_id = ?
+  and deleted_at is null
 order by created_at desc;
 
 -- add promotion_code
-insert into promotion_code(id,percent, max_off_price)
+insert into promotion_code(id, percent, max_off_price)
 values (?, ?, ?);
 -- delete promotion_code
-update promotion_code set deleted_at = now() where id= ?;
+update promotion_code
+set deleted_at = now()
+where id = ?;
 
 -- create new order
 insert into "order"(user_id, address_id, product_id, store_id, shipping_method_id, applied_promotion_code)
-values (?, ?, ?, ?,?);
+values (?, ?, ?, ?, ?);
+
+-- add product to order
+insert into product_order(product_id, store_id, order_id)
+values (?, ?, ?);
+-- delete product from order
+delete
+from product_order
+where order_id = ?
+  and product_id = ?
+  and store_id = ?;
+-- update product order quantity
+update product_order
+set quantity = ?
+where order_id = ?
+  and product_id = ?
+  and store_id = ?;
+-- get all product_ids in the order
+select product_id, store_id
+from product_order
+where order_id = ?;
+-- get all user orders
+select order_id,
+       status,
+       tracking_code,
+       user_id,
+       address_id,
+       product_id,
+       store_id,
+       shipping_method_id,
+       applied_promotion_code,
+       is_paid,
+       pay_date,
+       created_at
+from "order"
+where user_id = ?;
+-- filter orders by status
+select order_id,
+       status,
+       tracking_code,
+       user_id,
+       address_id,
+       product_id,
+       store_id,
+       shipping_method_id,
+       applied_promotion_code,
+       is_paid,
+       pay_date,
+       created_at
+from "order"
+where status = ?;
+-- user payed for the order
+begin;
+update "order"
+set is_paid = true,
+    status='confirmed',
+    pay_date=now()
+where order_id = ?
+  and user_id = ?;
+
+insert into payment(order_id, user_id, total_price) values (?,?,?);
+commit ;
 
 
 
