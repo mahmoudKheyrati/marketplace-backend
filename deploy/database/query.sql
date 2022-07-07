@@ -487,6 +487,17 @@ from ticket where user_id = ? ;
 -- make chat done!
 update ticket set is_done = true, done_at = now() where id = ? and employee_id= ? ;
 
+-- add ticket message
+insert into ticket_message(ticket_id, sender_id, message_text)
+values (?, ?, ?);
+-- set message status to received
+update ticket_message set status = 'received' where id = ? and sender_id = ?;
 
+-- set message status to seen
+update ticket_message set status = 'seen' where id = ? and sender_id = ?;
+-- get ticket chats
+select * from ticket_message where ticket_id = ?
+order by created_at desc
+limit 20 offset ?;
 
 
