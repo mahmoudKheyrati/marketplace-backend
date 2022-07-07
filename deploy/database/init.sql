@@ -1,6 +1,6 @@
 -- when a product state change to available state, users that interest in that product will be notified.
 ---------------------- marketplace ------------------------------------------
-drop table if exists user_permission;
+drop table if exists user_permission cascade ;
 create table user_permission
 (
     id                           bigserial primary key,
@@ -14,7 +14,7 @@ create table user_permission
     created_at                   timestamptz default now()
 );
 
-drop table if exists "user";
+drop table if exists "user" cascade ;
 create table "user" -- login with email and password
 (
     id           bigserial primary key,
@@ -65,7 +65,7 @@ create table category
 );
 
 
-drop table if exists store;
+drop table if exists store cascade ;
 create table store
 (
     id          bigserial primary key,
@@ -94,7 +94,7 @@ create table store_category
 (
     category_id bigint references category (id) on delete set null on update cascade,
     store_id    bigint references store (id) on delete set null on update cascade,
-    constraint unique (category_id, store_id)
+    unique (category_id, store_id)
 );
 
 
