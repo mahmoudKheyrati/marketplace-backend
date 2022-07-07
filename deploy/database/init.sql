@@ -201,7 +201,9 @@ drop table if exists "order";
 create table "order"
 (
     order_id               bigserial primary key,
-    status                 text   not null default 'confirmed' check ( status in ('confirmed', 'is-packing', 'packed', 'shipped')),
+    status                 text   not null default 'ongoing' check ( status in
+                                                                     ('ongoing', 'cancelled-by-user', 'confirmed',
+                                                                      'is-packing', 'packed', 'shipped')),
     tracking_code          text            default 'not-set',
     user_id                bigint not null references "user" (id),
     address_id             bigint not null references address (id) on update cascade,
@@ -210,7 +212,7 @@ create table "order"
     shipping_method_id     text   not null references shipping_method (name),
     applied_promotion_code text references promotion_code (id),
     is_paid                bool   not null default false,
-    is_canceled            bool   not null default false,
+    pay_date               timestamptz,
     created_at             timestamptz     default now()
 );
 
