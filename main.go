@@ -65,11 +65,6 @@ func main() {
 		notification.Post("/subscribe/:productId", notificationHandler.SubscribeToProduct)
 		notification.Post("/seen/:productId", notificationHandler.SeenNotification)
 	}
-	v2.Get("/test", authMiddleware.Protected(), func(c *fiber.Ctx) error {
-		data := c.Locals(pkg.JwtDataKey).(api.JwtData)
-		fmt.Println("api:::: ", data)
-		return c.SendStatus(fiber.StatusAccepted)
-	})
 
 	log.Fatal(app.Listen(fmt.Sprintf(":%d", cfg.Port)))
 }
