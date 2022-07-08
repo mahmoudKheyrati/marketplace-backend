@@ -505,12 +505,14 @@ values (?, ?, ?);
 update ticket_message
 set status = 'received'
 where id = ?
+  and ticket_id = ?
   and sender_id = ?;
 
 -- set message status to seen
 update ticket_message
 set status = 'seen'
 where id = ?
+  and ticket_id = ?
   and sender_id = ?;
 -- get ticket chats
 select *
