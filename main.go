@@ -41,6 +41,8 @@ func main() {
 	notificationRepo := repository.NewNotificationRepoImpl(db)
 
 	authHandler := api.NewAuthHandler(authRepo, cfg)
+	notificationHandler := api.NewNotificationHandler(notificationRepo)
+
 	authMiddleware := middleware.NewAuthMiddleware(cfg.JwtSecret)
 
 	app := fiber.New()
@@ -58,10 +60,10 @@ func main() {
 	}
 	notification := v2.Group("/notifications", authMiddleware.Protected())
 	{
-		notification.Get("/")
-		notification.Get("/pending")
-		notification.Post("/subscribe/:productId")
-		notification.Post("/seen")
+		notification.Get("/", notificationHandler.GetAvailableNotifications)
+		notification.Get("/pending", notificationHandler.GetPendingNotifications)
+		notification.Post("/subscribe/:productId", notificationHandler.SubscribeToProduct)
+		notification.Post("/seen", notificationHandler.SeenNotification)
 	}
 	v2.Get("/test", authMiddleware.Protected(), func(c *fiber.Ctx) error {
 		data := c.Locals(pkg.JwtDataKey).(api.JwtData)
