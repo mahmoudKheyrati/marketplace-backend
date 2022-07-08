@@ -38,6 +38,8 @@ func main() {
 	defer db.Close()
 	// create repositories
 	authRepo := repository.NewAuthRepoImpl(db)
+	notificationRepo := repository.NewNotificationRepoImpl(db)
+
 	authHandler := api.NewAuthHandler(authRepo, cfg)
 	authMiddleware := middleware.NewAuthMiddleware(cfg.JwtSecret)
 
@@ -53,6 +55,13 @@ func main() {
 	{
 		auth.Post("/token", authHandler.Login)
 		auth.Post("/signup", authHandler.Signup)
+	}
+	notification := v2.Group("/notifications", authMiddleware.Protected())
+	{
+		notification.Get("/")
+		notification.Get("/pending")
+		notification.Post("/subscribe/:productId")
+		notification.Post("/seen")
 	}
 	v2.Get("/test", authMiddleware.Protected(), func(c *fiber.Ctx) error {
 		data := c.Locals(pkg.JwtDataKey).(api.JwtData)
