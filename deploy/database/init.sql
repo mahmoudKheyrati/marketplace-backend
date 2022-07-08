@@ -32,10 +32,10 @@ create table "user" -- login with email and password
     email           text not null unique,
     password        text not null,
     phone_number    text not null unique,
-    first_name      text default '',
-    last_name       text default '',
-    avatar_url      text default '',
-    national_id     text default '',
+    first_name      text        default '',
+    last_name       text        default '',
+    avatar_url      text        default '',
+    national_id     text        default '',
     permission_name text references user_permission (name) on delete set null on update cascade,
     created_at      timestamptz default now()
 );
@@ -157,20 +157,13 @@ create table store_product
 drop table if exists product_available_subscription;
 create table product_available_subscription
 (
+    id                   bigint primary key,
     product_id           bigint not null references product (id) on delete cascade on update cascade,
     user_id              bigint not null references "user" (id) on delete cascade on update cascade,
     created_at           timestamptz     default now(),
-    is_notification_sent bool   not null default false,
-    unique (product_id, user_id)
+    is_notification_sent bool   not null default false
 );
 
-drop table if exists notification;
-create table notification
-( -- use this table as event log, for performance perspective we don't use foreign-key or unique constraint
-    user_id    bigint,
-    product_id bigint,
-    sent_at    timestamptz default now()
-);
 
 drop table if exists review cascade;
 create table review
@@ -206,7 +199,7 @@ create table promotion_code
     deleted_at    timestamptz
 );
 
-drop table if exists "order" cascade ;
+drop table if exists "order" cascade;
 create table "order"
 (
     order_id               bigserial primary key,
@@ -263,7 +256,7 @@ create table ticket
     user_id        bigint                 not null references "user" (id) on update cascade,
     employee_id    bigint      default -1 not null references "user" (id) on update cascade,
     ticket_type_id bigint                 not null references ticket_type (id) on update cascade,
-    is_done        bool default false,
+    is_done        bool        default false,
     done_at        timestamptz,
     created_at     timestamptz default now()
 
@@ -271,10 +264,10 @@ create table ticket
 drop table if exists ticket_message cascade;
 create table ticket_message
 (
-    id bigserial primary key ,
+    id           bigserial primary key,
     ticket_id    bigint not null references ticket (id) on update cascade,
     sender_id    bigint not null references "user" (id),
-    message_text text not null ,
-    status       text default 'sent' check ( status in ('sent', 'received', 'seen')),
+    message_text text   not null,
+    status       text        default 'sent' check ( status in ('sent', 'received', 'seen')),
     created_at   timestamptz default now()
 );
