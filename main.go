@@ -40,10 +40,12 @@ func main() {
 	authRepo := repository.NewAuthRepoImpl(db)
 	notificationRepo := repository.NewNotificationRepoImpl(db)
 	ticketRepo := repository.NewTicketRepoImpl(db)
+	userRepo := repository.NewUserRepoImpl(db)
 
 	authHandler := api.NewAuthHandler(authRepo, cfg)
 	notificationHandler := api.NewNotificationHandler(notificationRepo)
 	ticketHandler := api.NewTicketHandler(ticketRepo)
+	userHandler := api.NewUserHandler(userRepo)
 
 	authMiddleware := middleware.NewAuthMiddleware(cfg.JwtSecret)
 
@@ -78,6 +80,10 @@ func main() {
 		//tickets.Post("/received/:ticketId/:messageId")
 		//tickets.Post("/seen/:ticketId/:messageId")
 		tickets.Get("/chats/:ticketId", ticketHandler.LoadTicketMessages)
+	}
+	users := v2.Group("/users", authMiddleware.Protected())
+	{
+		users.Get("/me", userHandler.GetMyProfile)
 	}
 
 	log.Fatal(app.Listen(fmt.Sprintf(":%d", cfg.Port)))
