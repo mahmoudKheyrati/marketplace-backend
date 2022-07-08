@@ -8,8 +8,9 @@ import (
 )
 
 type Config struct {
-	Postgres PostgresConfig
-	Port     int
+	Postgres  PostgresConfig
+	Port      int
+	JwtSecret string
 }
 type PostgresConfig struct {
 	Host          string
@@ -36,7 +37,8 @@ func NewConfig() *Config {
 		viper.AddConfigPath(".")
 
 		config = &Config{
-			Port: viper.GetInt("port"),
+			Port:      viper.GetInt("port"),
+			JwtSecret: viper.GetString("jwt_secret"),
 			Postgres: PostgresConfig{
 				Host:          viper.GetString("db.postgres.host"),
 				Port:          viper.GetInt("db.postgres.port"),
