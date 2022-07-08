@@ -39,9 +39,11 @@ func main() {
 	// create repositories
 	authRepo := repository.NewAuthRepoImpl(db)
 	notificationRepo := repository.NewNotificationRepoImpl(db)
+	ticketRepo := repository.NewTicketRepoImpl(db)
 
 	authHandler := api.NewAuthHandler(authRepo, cfg)
 	notificationHandler := api.NewNotificationHandler(notificationRepo)
+	ticketHandler := api.NewTicketHandler(ticketRepo)
 
 	authMiddleware := middleware.NewAuthMiddleware(cfg.JwtSecret)
 
@@ -64,6 +66,18 @@ func main() {
 		notification.Get("/pending", notificationHandler.GetPendingNotifications)
 		notification.Post("/subscribe/:productId", notificationHandler.SubscribeToProduct)
 		notification.Post("/seen/:productId", notificationHandler.SeenNotification)
+	}
+
+	tickets := v2.Group("/tickets", authMiddleware.Protected())
+	{
+		tickets.Get("/", ticketHandler.GetAllTickets)
+		tickets.Get("/types", ticketHandler.GetAllTicketTypes)
+		tickets.Post("/create/:ticketTypeId", ticketHandler.CreateTicket)
+		//tickets.Post("/done/:ticketId")
+		tickets.Post("/send_message/:ticketId", ticketHandler.SendMessageToTicket)
+		//tickets.Post("/received/:ticketId/:messageId")
+		//tickets.Post("/seen/:ticketId/:messageId")
+		tickets.Get("/chats/:ticketId", ticketHandler.LoadTicketMessages)
 	}
 
 	log.Fatal(app.Listen(fmt.Sprintf(":%d", cfg.Port)))
