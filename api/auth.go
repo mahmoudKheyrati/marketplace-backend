@@ -32,10 +32,7 @@ type LoginRequest struct {
 func (a *AuthHandler) Login(c *fiber.Ctx) error {
 	var request LoginRequest
 	if err := c.BodyParser(&request); err != nil {
-		if err := c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "error in parsing request body"}); err != nil {
-			pkg.Logger().Error(err)
-		}
-		return nil
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "error in parsing request body"})
 	}
 
 	user, err := a.authRepo.Authenticate(context.Background(), request.Email, request.Password)
@@ -45,10 +42,7 @@ func (a *AuthHandler) Login(c *fiber.Ctx) error {
 	}
 
 	if user == nil {
-		if err := c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "username or password are not valid!"}); err != nil {
-			pkg.Logger().Error(err)
-		}
-		return nil
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "username or password are not valid!"})
 	}
 
 	token := jwt.New(jwt.SigningMethodHS256)
@@ -76,22 +70,12 @@ type SignUpRequest struct {
 func (a *AuthHandler) Signup(c *fiber.Ctx) error {
 	var request SignUpRequest
 	if err := c.BodyParser(&request); err != nil {
-		if err := c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "error in parsing request body"}); err != nil {
-			pkg.Logger().Error(err)
-		}
-		return nil
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "error in parsing request body"})
 	}
 	err := a.authRepo.SignUp(context.Background(), request.Email, request.Password, request.PhoneNumber, request.FirstName, request.LastName)
 	if err != nil {
-		if err := c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "can not make user!. change your input"}); err != nil {
-			pkg.Logger().Error(err)
-		}
-		pkg.Logger().Error(err)
-		return nil
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "can not make user!. change your input"})
 	}
 
-	if err = c.JSON(fiber.Map{"status": "ok", "message": "success signup"}); err != nil {
-		pkg.Logger().Error(err)
-	}
-	return nil
+	return c.JSON(fiber.Map{"status": "ok", "message": "success signup"})
 }
