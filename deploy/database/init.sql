@@ -23,10 +23,10 @@ create table "user" -- login with email and password
     email           text not null unique,
     password        text not null,
     phone_number    text not null unique,
-    first_name      text,
-    last_name       text,
-    avatar_url      text,
-    national_id     text,
+    first_name      text default '',
+    last_name       text default '',
+    avatar_url      text default '',
+    national_id     text default '',
     permission_name text references user_permission (name) on delete set null on update cascade,
     created_at      timestamptz default now()
 );
@@ -197,7 +197,7 @@ create table promotion_code
     deleted_at    timestamptz
 );
 
-drop table if exists "order";
+drop table if exists "order" cascade ;
 create table "order"
 (
     order_id               bigserial primary key,
