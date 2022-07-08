@@ -5,7 +5,6 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/mahmoudKheyrati/marketplace-backend/internal/model"
 	"golang.org/x/crypto/bcrypt"
-	"log"
 )
 
 type AuthRepo interface {
@@ -69,7 +68,6 @@ func (a *AuthRepoImpl) SignUp(ctx context.Context, email, password, phoneNumber,
 	if err != nil {
 		return err
 	}
-	log.Println(string(passwordHash))
 	_, err = a.db.Query(ctx, `insert into "user" (email, password, phone_number, first_name, last_name, permission_name)
 values ($1, $2, $3, $4, $5, 'normal-user')`,
 		email, string(passwordHash), phoneNumber, firstName, lastName)
