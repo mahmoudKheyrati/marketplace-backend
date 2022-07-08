@@ -2,8 +2,10 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
+	"github.com/mahmoudKheyrati/marketplace-backend/config"
 	"github.com/mahmoudKheyrati/marketplace-backend/internal/repository"
 	"github.com/mahmoudKheyrati/marketplace-backend/pkg"
 	"golang.org/x/crypto/bcrypt"
@@ -12,10 +14,11 @@ import (
 
 type AuthHandler struct {
 	authRepo repository.AuthRepo
+	config   *config.Config
 }
 
-func NewAuthHandler(authRepo repository.AuthRepo) *AuthHandler {
-	return &AuthHandler{authRepo: authRepo}
+func NewAuthHandler(authRepo repository.AuthRepo, config *config.Config) *AuthHandler {
+	return &AuthHandler{authRepo: authRepo, config: config}
 }
 
 // CheckPasswordHash compare password with hash
@@ -27,6 +30,9 @@ func CheckPasswordHash(password, hash string) bool {
 type LoginRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+type JwtData struct {
+	UserId int64 `json:"user_id"`
 }
 
 func (a *AuthHandler) Login(c *fiber.Ctx) error {
@@ -48,10 +54,16 @@ func (a *AuthHandler) Login(c *fiber.Ctx) error {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
-	claims["user_id"] = user.Id
+	jwtData := JwtData{UserId: user.Id}
+	marshalledData, err := json.Marshal(jwtData)
+	if err != nil {
+		pkg.Logger().Error(err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+	claims[pkg.JwtDataTokenKey] = string(marshalledData)
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
-	t, err := token.SignedString([]byte("SECRET_SHOULD_READ_FROM_CONFIG"))
+	t, err := token.SignedString([]byte(a.config.JwtSecret))
 	if err != nil {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
