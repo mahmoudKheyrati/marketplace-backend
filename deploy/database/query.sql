@@ -295,19 +295,15 @@ from cte;
 -- subscribe to product availability
 insert into product_available_subscription(product_id, user_id)
 values (?, ?);
--- send notification of product availability to user
-begin;
-delete
-from product_available_subscription
-where user_id = ?
-  and product_id = ?;
-insert into notification(user_id, product_id)
-values (?, ?);
-commit;
--- get all products that user subscribed on
+-- get all user notifications
+select id, product_id, user_id, created_at, is_notification_sent, available_status
+from product_available_subscription where user_id = ?and is_notification_sent = false and available_status = true;
+-- make notification seen
+update product_available_subscription set is_notification_sent = true where user_id= ? and id= ?;
+-- get all products that user subscribed on and not available
 select product_id, user_id, created_at, is_notification_sent
 from product_available_subscription
-where user_id = ?;
+where user_id = ? and available_status = false and is_notification_sent = false;
 
 -- create review
 insert into review (product_id, store_id, user_id, rate, review_text)
