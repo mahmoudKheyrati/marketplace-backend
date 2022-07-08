@@ -157,11 +157,12 @@ create table store_product
 drop table if exists product_available_subscription;
 create table product_available_subscription
 (
-    id                   bigint primary key,
+    id                   bigserial primary key,
     product_id           bigint not null references product (id) on delete cascade on update cascade,
     user_id              bigint not null references "user" (id) on delete cascade on update cascade,
     created_at           timestamptz     default now(),
-    is_notification_sent bool   not null default false
+    is_notification_sent bool   not null default false,
+    available_status     bool   not null default false
 );
 
 
