@@ -1,14 +1,13 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/jackc/pgx/v4"
+	"github.com/mahmoudKheyrati/marketplace-backend/api"
 	"github.com/mahmoudKheyrati/marketplace-backend/config"
 	"github.com/mahmoudKheyrati/marketplace-backend/pkg"
 	"go.uber.org/zap"
@@ -34,12 +33,7 @@ func main() {
 		Database:      cfg.Postgres.Database,
 		MaxConnection: cfg.Postgres.MaxConnection,
 	})
-	defer func(db *pgx.Conn, ctx context.Context) {
-		err := db.Close(ctx)
-		if err != nil {
-			pkg.Log.Fatal(err)
-		}
-	}(db, ctx)
+	defer db.Close()
 
 	app := fiber.New()
 	app.Use(recover.New())
