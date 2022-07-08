@@ -20,8 +20,8 @@ from "user"
 where email = ?
   and password = ?;
 -- signup
-insert into "user" (email, password, phone_number, first_name, last_name, avatar_url, national_id, permission_name)
-values (?, ?, ?, ?, ?, '', '', 'normal-user');
+insert into "user" (email, password, phone_number, first_name, last_name, permission_name)
+values (?, ?, ?, ?, ?, 'normal-user');
 -- add address for user
 insert into address(user_id, country, province, city, street, postal_code, home_phone_number)
 values (?, ?, ?, ?, ?, ?, ?);
