@@ -63,7 +63,7 @@ func main() {
 		notification.Get("/", notificationHandler.GetAvailableNotifications)
 		notification.Get("/pending", notificationHandler.GetPendingNotifications)
 		notification.Post("/subscribe/:productId", notificationHandler.SubscribeToProduct)
-		notification.Post("/seen", notificationHandler.SeenNotification)
+		notification.Post("/seen/:productId", notificationHandler.SeenNotification)
 	}
 	v2.Get("/test", authMiddleware.Protected(), func(c *fiber.Ctx) error {
 		data := c.Locals(pkg.JwtDataKey).(api.JwtData)
