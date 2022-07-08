@@ -16,6 +16,10 @@ type AddressRepoImpl struct {
 	db *pgxpool.Pool
 }
 
+func NewAddressRepoImpl(db *pgxpool.Pool) *AddressRepoImpl {
+	return &AddressRepoImpl{db: db}
+}
+
 func (a *AddressRepoImpl) CreateAddress(ctx context.Context, userId int64, country, province, city, street, postalCode, homePhoneNumber string) (int64, error) {
 	query := `insert into address(user_id, country, province, city, street, postal_code, home_phone_number)
 values ($1, $2, $3, $4, $5, $6, $7) returning id`
