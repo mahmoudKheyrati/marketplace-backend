@@ -34,6 +34,7 @@ func (a *AuthMiddleware) Protected() fiber.Handler {
 				return c.SendStatus(fiber.StatusInternalServerError)
 			}
 			c.Locals(pkg.JwtDataKey, jwtData)
+			c.Locals(pkg.UserIdKey, jwtData.UserId)
 			return c.Next()
 		},
 		ErrorHandler: jwtError,
