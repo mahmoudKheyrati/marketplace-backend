@@ -514,11 +514,11 @@ set status = 'seen'
 where id = ?
   and ticket_id = ?
   and sender_id = ?;
--- get ticket chats
-select *
+-- get ticket messages
+select id, ticket_id, sender_id, message_text, status, created_at
 from ticket_message
 where ticket_id = ?
 order by created_at desc
-limit 20 offset ?;
+limit 5 offset ?;
 
 
