@@ -41,11 +41,13 @@ func main() {
 	notificationRepo := repository.NewNotificationRepoImpl(db)
 	ticketRepo := repository.NewTicketRepoImpl(db)
 	userRepo := repository.NewUserRepoImpl(db)
+	addressRepo := repository.NewAddressRepoImpl(db)
 
 	authHandler := api.NewAuthHandler(authRepo, cfg)
 	notificationHandler := api.NewNotificationHandler(notificationRepo)
 	ticketHandler := api.NewTicketHandler(ticketRepo)
 	userHandler := api.NewUserHandler(userRepo)
+	addressHandler := api.NewAddressHandler(addressRepo)
 
 	authMiddleware := middleware.NewAuthMiddleware(cfg.JwtSecret)
 
@@ -84,6 +86,13 @@ func main() {
 	users := v2.Group("/users", authMiddleware.Protected())
 	{
 		users.Get("/me", userHandler.GetMyProfile)
+	}
+	addresses := v2.Group("addresses", authMiddleware.Protected())
+	{
+		addresses.Get("/", addressHandler.GetAllAddresses)
+		addresses.Post("/create", addressHandler.CreateAddress)
+		addresses.Post("/update/:addressId", addressHandler.UpdateAddress)
+		addresses.Delete("/delete/:addressId", addressHandler.DeleteAddress)
 	}
 
 	log.Fatal(app.Listen(fmt.Sprintf(":%d", cfg.Port)))
