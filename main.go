@@ -9,6 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/mahmoudKheyrati/marketplace-backend/api"
 	"github.com/mahmoudKheyrati/marketplace-backend/config"
+	"github.com/mahmoudKheyrati/marketplace-backend/internal/repository"
 	"github.com/mahmoudKheyrati/marketplace-backend/pkg"
 	"go.uber.org/zap"
 	"log"
@@ -34,16 +35,22 @@ func main() {
 		MaxConnection: cfg.Postgres.MaxConnection,
 	})
 	defer db.Close()
-
+	// create repositories
+	authRepo := repository.NewAuthRepoImpl(db)
+	authHandler := api.NewAuthHandler(authRepo)
 	app := fiber.New()
 	app.Use(recover.New())
 	app.Use(cors.New())
 	app.Use(logger.New())
 	app.Get("/metrics", monitor.New(monitor.Config{Title: "MyService Metrics Page"}))
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
-	})
+	apiRoute := app.Group("/api")
+	v2 := apiRoute.Group("/v2")
+	auth := v2.Group("/auth")
+	{
+		auth.Post("/token", authHandler.Login)
+		auth.Post("/signup", authHandler.Signup)
+	}
 
 	log.Fatal(app.Listen(fmt.Sprintf(":%d", cfg.Port)))
 }
