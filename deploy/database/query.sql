@@ -297,13 +297,21 @@ insert into product_available_subscription(product_id, user_id)
 values (?, ?);
 -- get all user notifications
 select id, product_id, user_id, created_at, is_notification_sent, available_status
-from product_available_subscription where user_id = ?and is_notification_sent = false and available_status = true;
+from product_available_subscription
+where user_id = ?
+  and is_notification_sent = false
+  and available_status = true;
 -- make notification seen
-update product_available_subscription set is_notification_sent = true where user_id= ? and id= ?;
+update product_available_subscription
+set is_notification_sent = true
+where user_id = ?
+  and id = ?;
 -- get all products that user subscribed on and not available
 select product_id, user_id, created_at, is_notification_sent
 from product_available_subscription
-where user_id = ? and available_status = false and is_notification_sent = false;
+where user_id = ?
+  and available_status = false
+  and is_notification_sent = false;
 
 -- create review
 insert into review (product_id, store_id, user_id, rate, review_text)
@@ -444,8 +452,9 @@ set is_paid = true,
 where order_id = ?
   and user_id = ?;
 
-insert into payment(order_id, user_id, total_price) values (?,?,?);
-commit ;
+insert into payment(order_id, user_id, total_price)
+values (?, ?, ?);
+commit;
 
 
 -- crate ticket-types
@@ -454,38 +463,59 @@ insert into ticket_type(name, description)
 values ('', '');
 -- update ticket-types
 begin;
-update ticket_type set is_last_version = false where id = ?;
-insert into ticket_type(name, description) values (?, ?);
-commit ;
+update ticket_type
+set is_last_version = false
+where id = ?;
+insert into ticket_type(name, description)
+values (?, ?);
+commit;
 -- delete ticket_type
-update ticket_type set is_last_version = false where id = ?;
+update ticket_type
+set is_last_version = false
+where id = ?;
 -- get all ticket types
 select id, name, description
-from ticket_type where is_last_version = true;
+from ticket_type
+where is_last_version = true;
 
 -- create new ticket
 insert into ticket(user_id, ticket_type_id)
 values (?, ?);
 -- get user all tickets
 select id, user_id, employee_id, ticket_type_id, is_done, done_at, created_at
-from ticket where user_id = ? order by created_at desc ;
+from ticket
+where user_id = ?
+order by created_at desc;
 -- filter user tickets by ticket_type
 select id, user_id, employee_id, ticket_type_id, is_done, done_at, created_at
-from ticket where user_id = ? ;
+from ticket
+where user_id = ?;
 
 -- make chat done!
-update ticket set is_done = true, done_at = now() where id = ? and employee_id= ? ;
+update ticket
+set is_done = true,
+    done_at = now()
+where id = ?
+  and employee_id = ?;
 
 -- add ticket message
 insert into ticket_message(ticket_id, sender_id, message_text)
 values (?, ?, ?);
 -- set message status to received
-update ticket_message set status = 'received' where id = ? and sender_id = ?;
+update ticket_message
+set status = 'received'
+where id = ?
+  and sender_id = ?;
 
 -- set message status to seen
-update ticket_message set status = 'seen' where id = ? and sender_id = ?;
+update ticket_message
+set status = 'seen'
+where id = ?
+  and sender_id = ?;
 -- get ticket chats
-select * from ticket_message where ticket_id = ?
+select *
+from ticket_message
+where ticket_id = ?
 order by created_at desc
 limit 20 offset ?;
 
