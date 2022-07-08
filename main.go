@@ -16,8 +16,8 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
-	zapLogger := pkg.NewLogger()
+	//ctx := context.Background()
+	zapLogger := pkg.Logger()
 	defer func(logger *zap.SugaredLogger) {
 		err := zapLogger.Sync()
 		if err != nil {

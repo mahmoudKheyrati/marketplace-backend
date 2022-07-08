@@ -8,7 +8,7 @@ import (
 var Log *zap.SugaredLogger
 var once sync.Once
 
-func NewLogger() *zap.SugaredLogger {
+func Logger() *zap.SugaredLogger {
 	once.Do(func() {
 		logger, _ := zap.NewProduction()
 		Log = logger.Sugar()
