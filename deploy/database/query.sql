@@ -92,29 +92,26 @@ values (?, ?, ?, ?, ?);
 update store
 set name= ?,
     description = ?,
-    avatar_url = ?,
-    owner = ?
-where id = ?;
+    avatar_url = ?
+where id = ? and owner = ?;
 
 -- get user all stores
 select id, name, description, avatar_url, owner, creator, created_at
 from store
-where creator = ?;
+where creator = ? and deleted_at is null;
 
 -- get all marketplace stores
 select id, name, description, avatar_url, owner, creator, created_at
-from store;
--- delete store
-delete
 from store
-where id = ?
-  and creator = ?;
-
+where deleted_at is null;
+-- delete store
+update store set deleted_at = now() where id= ? and owner = ? ;
 
 -- add address for store
-
 insert into store_address (country, province, city, street, postal_code)
 values (?, ?, ?, ?, ?);
+-- check user is the owner of store or not
+select exists(select 1 from store where owner = ? and id = ?);
 -- get store addresses
 select store_id, country, province, city, street, postal_code, created_at
 from store_address
@@ -126,7 +123,7 @@ set country     =?,
     city= ?,
     street= ?,
     postal_code = ?
-where store_id = ?;
+where store_id = ? ;
 
 -- insert store category
 insert into store_category(category_id, store_id)
@@ -137,6 +134,25 @@ delete
 from store_category
 where category_id =?
   and store_id = ?;
+
+-- store add product
+insert into store_product(product_id, store_id, off_percent, max_off_price, price, available_count, warranty_id)
+values (?,?,?,?,?,?,?);
+-- update store product
+update store_product
+set off_percent= ?, max_off_price= ? , price = ?, available_count = ? , warranty_id = ?
+where store_id = ? and product_id= ? ;
+-- get all products of store
+select id,
+       category_id,
+       name,
+       brand,
+       description,
+       picture_url,
+       specification,
+       p.created_at as created_at
+from product p join store_product sp on p.id=sp.product_id;
+
 
 -- add product
 insert into product (category_id, name, brand, description, picture_url, specification)

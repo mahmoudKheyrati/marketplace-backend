@@ -103,13 +103,15 @@ create table store
     avatar_url  text,
     owner       bigint references "user" (id),
     creator     bigint references "user" (id),
-    created_at  timestamptz default now()
+    created_at  timestamptz default now(),
+    deleted_at  timestamptz
 ); -- a user can have a store or multiple store?; each store can have multiple products and can available them.
 
 drop table if exists store_address;
 create table store_address
 (
-    store_id    bigint references "store" (id),
+    id          bigserial primary key,
+    store_id    bigint references "store" (id) on update cascade on delete set null,
     country     text,
     province    text,
     city        text,
