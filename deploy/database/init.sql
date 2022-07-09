@@ -224,7 +224,7 @@ create table promotion_code
 drop table if exists "order" cascade;
 create table "order"
 (
-    order_id               bigserial primary key,
+    id               bigserial primary key,
     status                 text   not null default 'ongoing' check ( status in
                                                                      ('ongoing', 'cancelled-by-user', 'confirmed',
                                                                       'is-packing', 'packed', 'shipped')),
@@ -243,7 +243,7 @@ create table product_order
 (
     product_id bigint not null references product (id),
     store_id   bigint not null references store (id),
-    order_id   bigint references "order" (order_id),
+    order_id   bigint references "order" (id),
     quantity   bigint      default 1,
     created_at timestamptz default now(),
     unique (product_id, store_id, order_id)

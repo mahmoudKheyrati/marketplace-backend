@@ -485,8 +485,8 @@ set deleted_at = now()
 where id = ?;
 
 -- create new order
-insert into "order"(user_id, address_id, product_id, store_id, shipping_method_id, applied_promotion_code)
-values (?, ?, ?, ?, ?);
+insert into "order"(user_id )
+values (?) returning id;
 
 -- add product to order
 insert into product_order(product_id, store_id, order_id)
