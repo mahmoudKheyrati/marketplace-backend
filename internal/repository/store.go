@@ -5,7 +5,8 @@ import (
 	"github.com/mahmoudKheyrati/marketplace-backend/internal/model"
 )
 
-type StoreRepository interface {
+type StoreRepo interface {
+	GetStoreByStoreId(ctx context.Context, storeId int64) (*model.StoreProduct, error)
 	CreateStore(ctx context.Context, name, description string, owner, creator int64) (int64, error)
 	UpdateStore(ctx context.Context, name, description string, owner, storeId int64) (int64, error)
 	DeleteStore(ctx context.Context, owner, storeId int64) error
