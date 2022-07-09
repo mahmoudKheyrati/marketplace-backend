@@ -8,7 +8,6 @@ import (
 	"github.com/mahmoudKheyrati/marketplace-backend/config"
 	"github.com/mahmoudKheyrati/marketplace-backend/internal/repository"
 	"github.com/mahmoudKheyrati/marketplace-backend/pkg"
-	"golang.org/x/crypto/bcrypt"
 	"time"
 )
 
@@ -19,12 +18,6 @@ type AuthHandler struct {
 
 func NewAuthHandler(authRepo repository.AuthRepo, config *config.Config) *AuthHandler {
 	return &AuthHandler{authRepo: authRepo, config: config}
-}
-
-// CheckPasswordHash compare password with hash
-func CheckPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
 }
 
 type LoginRequest struct {
