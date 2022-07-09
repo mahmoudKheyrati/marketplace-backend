@@ -188,37 +188,63 @@ delete
 from product
 where id = ?;
 
--- select products by name
+-- search products by name
 select id, category_id, name, brand, description, picture_url, specification
 from product
 where name ilike '%?%';
 -- important
--- select products by brand
+-- search products by brand
 select id, category_id, name, brand, description, picture_url, specification
 from product
 where brand ilike '%?%';
 -- important
--- select products by category
--- todo: add recursive query to get sub categories
-select *
+-- search products by category
+select id,
+       category_id,
+       name,
+       brand,
+       description,
+       picture_url,
+       specification,
+       created_at
 from product
 where category_id in (
+    with recursive cte as (
+        select id, name, parent
+        from category
+        where name = ?
+        union
+        select c2.id, c2.name, c2.parent
+        from category c2
+                 join cte as c1 on c2.parent = c1.id
+    )
     select id
-    from category
-    where category.name = ?
-);
+    from cte
+) order by category_id;
+
+-- get distinct brand by categoryId
+select distinct brand from product where category_id = ?;
 
 -- filter by brand
 select id, category_id, name, brand, description, picture_url, specification
 from product
 where category_id = ?
   and brand in (?);
+-- get price range by categoryId
+select min(sp.price) as min, max(sp.price) as max from store_product sp join product p on p.id = sp.product_id
+where p.category_id = ?;
 -- filter by price
 select id, category_id, name, brand, description, picture_url, specification
 from product p
          join store_product sp on p.id = sp.product_id
 where p.category_id = ?
   and sp.price between ? and ?;
+
+-- get category specifications distinct
+select distinct (jsonb_object_keys(p.specification))
+from product p
+         join category c on p.category_id = c.id
+where p.category_id = ?;
 
 -- filter by specification
 select id, category_id, name, brand, description, picture_url, specification
@@ -227,11 +253,7 @@ where category_id = ?
   and specification::jsonb ->> ? = ?;
 -- important
 
--- get category specifications distinct
-select distinct (jsonb_object_keys(p.specification))
-from product p
-         join category c on p.category_id = c.id
-where p.category_id = ?;
+
 
 -- sort by price cheapest to most expensive
 select p.id,
