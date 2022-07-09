@@ -487,7 +487,14 @@ where id = ?;
 -- create new order
 insert into "order"(user_id )
 values (?) returning id;
-
+-- check user owns the order
+select exists(select 1 from order where id = ? and user_id= ? );
+-- check if order not deleted
+select deleted_at is not null from "order" where id= ? and user_id = ? ;
+-- delete order
+delete from "order" where id = ? and user_id= ? and deleted_at is null  ;
+-- check user paid for order
+select is_paid from "order" where id = ? and user_id=? and deleted_at is null;
 -- add product to order
 insert into product_order(product_id, store_id, order_id)
 values (?, ?, ?);
@@ -504,51 +511,46 @@ where order_id = ?
   and product_id = ?
   and store_id = ?;
 -- get all product_ids in the order
-select product_id, store_id
+select product_id, store_id, order_id, quantity, created_at
 from product_order
 where order_id = ?;
 -- get all user orders
-select order_id,
+select id,
        status,
        tracking_code,
        user_id,
        address_id,
-       product_id,
-       store_id,
        shipping_method_id,
        applied_promotion_code,
+       payed_price,
        is_paid,
        pay_date,
        created_at
 from "order"
-where user_id = ?;
+where user_id = ? and deleted_at is null;
 -- filter orders by status
-select order_id,
+select id,
        status,
        tracking_code,
        user_id,
        address_id,
-       product_id,
-       store_id,
        shipping_method_id,
        applied_promotion_code,
+       payed_price,
        is_paid,
        pay_date,
        created_at
 from "order"
 where status = ?;
 -- user payed for the order
-begin;
 update "order"
 set is_paid = true,
     status='confirmed',
+    payed_price = ?,
     pay_date=now()
-where order_id = ?
+where id = ?
   and user_id = ?;
 
-insert into payment(order_id, user_id, total_price)
-values (?, ?, ?);
-commit;
 
 
 -- crate ticket-types

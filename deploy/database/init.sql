@@ -224,7 +224,7 @@ create table promotion_code
 drop table if exists "order" cascade;
 create table "order"
 (
-    id               bigserial primary key,
+    id                     bigserial primary key,
     status                 text   not null default 'ongoing' check ( status in
                                                                      ('ongoing', 'cancelled-by-user', 'confirmed',
                                                                       'is-packing', 'packed', 'shipped')),
@@ -233,9 +233,11 @@ create table "order"
     address_id             bigint references address (id) on update cascade,
     shipping_method_id     text references shipping_method (name),
     applied_promotion_code text references promotion_code (id),
+    payed_price            double precision,
     is_paid                bool   not null default false,
     pay_date               timestamptz,
-    created_at             timestamptz     default now()
+    created_at             timestamptz     default now(),
+    deleted_at             timestamptz
 );
 
 drop table if exists product_order;
