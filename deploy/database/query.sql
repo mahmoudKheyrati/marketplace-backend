@@ -98,6 +98,15 @@ select id, name, parent
 from cte;
 
 
+--get store by store_id
+select id,
+       name,
+       description,
+       avatar_url,
+       owner,
+       creator,
+       created_at
+from store where id = ?;
 -- create store
 insert into store(name, description, avatar_url, owner, creator)
 values (?, ?, ?, ?, ?);
@@ -328,11 +337,10 @@ select product_id,
        price,
        available_count,
        warranty_id,
-       created_at,
-       is_last_version
+       created_at
 from store_product
 where product_id = ?
-  and available_count > 0;
+  and available_count > 0 and is_last_version = true;
 
 -- get product warranty by warranty id
 select id, name, type, month, created_at
