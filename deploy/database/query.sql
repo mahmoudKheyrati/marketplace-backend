@@ -483,6 +483,10 @@ values (?, ?, ?);
 update promotion_code
 set deleted_at = now()
 where id = ?;
+--apply promotion code to order
+update "order" set applied_promotion_code = ? where id = ? and user_id = ? ;
+-- delete promotion code from oder
+update "order" set applied_promotion_code = null where id= ? and user_id = ? ;
 
 -- create new order
 insert into "order"(user_id )
