@@ -230,10 +230,8 @@ create table "order"
                                                                       'is-packing', 'packed', 'shipped')),
     tracking_code          text            default 'not-set',
     user_id                bigint not null references "user" (id),
-    address_id             bigint not null references address (id) on update cascade,
-    product_id             bigint not null references product (id),
-    store_id               bigint not null references store (id),
-    shipping_method_id     text   not null references shipping_method (name),
+    address_id             bigint references address (id) on update cascade,
+    shipping_method_id     text references shipping_method (name),
     applied_promotion_code text references promotion_code (id),
     is_paid                bool   not null default false,
     pay_date               timestamptz,
@@ -248,7 +246,7 @@ create table product_order
     order_id   bigint references "order" (order_id),
     quantity   bigint      default 1,
     created_at timestamptz default now(),
-    unique (product_id, store_id)
+    unique (product_id, store_id, order_id)
 );
 
 drop table if exists payment;
