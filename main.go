@@ -43,6 +43,7 @@ func main() {
 	userRepo := repository.NewUserRepoImpl(db)
 	addressRepo := repository.NewAddressRepoImpl(db)
 	voteRepo := repository.NewVoteRepoImpl(db)
+	reviewRepo := repository.NewReviewRepoImpl(db)
 
 	authHandler := api.NewAuthHandler(authRepo, cfg)
 	notificationHandler := api.NewNotificationHandler(notificationRepo)
@@ -50,6 +51,7 @@ func main() {
 	userHandler := api.NewUserHandler(userRepo)
 	addressHandler := api.NewAddressHandler(addressRepo)
 	voteHandler := api.NewVoteHandler(voteRepo)
+	reviewHandler := api.NewReviewHandler(reviewRepo)
 
 	authMiddleware := middleware.NewAuthMiddleware(cfg.JwtSecret)
 
@@ -96,10 +98,18 @@ func main() {
 		addresses.Post("/update/:addressId", addressHandler.UpdateAddress)
 		addresses.Delete("/delete/:addressId", addressHandler.DeleteAddress)
 	}
-	vote := v2.Group("/votes", authMiddleware.Protected())
+	votes := v2.Group("/votes", authMiddleware.Protected())
 	{
-		vote.Post("/create", voteHandler.CreateVote)
-		vote.Delete("/delete/:reviewId", voteHandler.DeleteVote)
+		votes.Post("/create", voteHandler.CreateVote)
+		votes.Delete("/delete/:reviewId", voteHandler.DeleteVote)
+	}
+	reviews := v2.Group("/reviews", authMiddleware.Protected())
+	{
+		reviews.Post("/create", reviewHandler.CreateReview)
+		reviews.Post("/update/:reviewId", reviewHandler.UpdateReview)
+		reviews.Delete("/delete/:reviewId", reviewHandler.DeleteReview)
+		reviews.Get("/me", reviewHandler.GetUserAllReviews)
+		reviews.Get("/product/:productId", reviewHandler.GetProductReviews)
 	}
 
 	log.Fatal(app.Listen(fmt.Sprintf(":%d", cfg.Port)))
