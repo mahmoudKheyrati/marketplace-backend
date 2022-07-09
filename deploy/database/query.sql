@@ -312,7 +312,7 @@ values (?, ?, ?, ?, ?);
 -- todo: check if user by a product from store.
 -- update review
 update review
-set rate=? and review_text = ?
+set rate=?, review_text = ?
 where id = ?
   and user_id=?
   and deleted_at is null;
@@ -350,7 +350,7 @@ with cte as (
            sum(case when v.up_vote = true then 1 else 0 end)   as up_votes,
            sum(case when v.down_vote = true then 1 else 0 end) as down_votes
     from review r
-             join votes v on r.id = v.review_id
+             left join votes v on r.id = v.review_id
     group by r.id, r.product_id, r.store_id, r.user_id, r.rate, r.review_text, r.created_at
 )
 select id,
@@ -369,16 +369,20 @@ order by up_votes * 2 + down_votes desc;
 
 
 -- sort reviews by created date
-select id,
-       product_id,
-       store_id,
-       user_id,
-       rate,
-       review_text,
-       created_at
-from review
+select r.id,
+       r.product_id,
+       r.store_id,
+       r.user_id,
+       r.rate,
+       r.review_text,
+       r.created_at,
+       sum(case when v.up_vote = true then 1 else 0 end)   as up_votes,
+       sum(case when v.down_vote = true then 1 else 0 end) as down_votes
+from review r
+         left join votes v on r.id = v.review_id
 where product_id = ?
   and deleted_at is null
+group by r.id, r.product_id, r.store_id, r.user_id, r.rate, r.review_text, r.created_at
 order by created_at desc;
 
 -- add promotion_code
