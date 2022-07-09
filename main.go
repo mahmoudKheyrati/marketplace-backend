@@ -42,12 +42,14 @@ func main() {
 	ticketRepo := repository.NewTicketRepoImpl(db)
 	userRepo := repository.NewUserRepoImpl(db)
 	addressRepo := repository.NewAddressRepoImpl(db)
+	voteRepo := repository.NewVoteRepoImpl(db)
 
 	authHandler := api.NewAuthHandler(authRepo, cfg)
 	notificationHandler := api.NewNotificationHandler(notificationRepo)
 	ticketHandler := api.NewTicketHandler(ticketRepo)
 	userHandler := api.NewUserHandler(userRepo)
 	addressHandler := api.NewAddressHandler(addressRepo)
+	voteHandler := api.NewVoteHandler(voteRepo)
 
 	authMiddleware := middleware.NewAuthMiddleware(cfg.JwtSecret)
 
@@ -93,6 +95,11 @@ func main() {
 		addresses.Post("/create", addressHandler.CreateAddress)
 		addresses.Post("/update/:addressId", addressHandler.UpdateAddress)
 		addresses.Delete("/delete/:addressId", addressHandler.DeleteAddress)
+	}
+	vote := v2.Group("/votes", authMiddleware.Protected())
+	{
+		vote.Post("/create", voteHandler.CreateVote)
+		vote.Delete("/delete/:reviewId", voteHandler.DeleteVote)
 	}
 
 	log.Fatal(app.Listen(fmt.Sprintf(":%d", cfg.Port)))
