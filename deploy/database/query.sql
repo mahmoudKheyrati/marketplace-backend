@@ -71,6 +71,22 @@ from category
 where parent = ?;
 -- get all categories with sub-categories
 -- todo: implement later if needed.
+select id, name, parent from category order by id, parent;
+
+-- get subcategories by category_id
+with recursive cte as (
+    select id,name,parent from category where id = ?
+    union
+    select c2.id,c2.name,c2.parent from category c2 join cte as c1 on c2.parent=c1.id
+) select id, name, parent from cte;
+
+-- get parents by category_id
+with recursive cte as (
+    select id,name,parent from category where id = 10
+    union
+    select c2.id,c2.name,c2.parent from category c2 join cte as c1 on c2.id=c1.parent
+) select id, name, parent from cte;
+
 
 -- create store
 insert into store(name, description, avatar_url, owner, creator)
