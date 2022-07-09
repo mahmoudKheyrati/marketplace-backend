@@ -23,4 +23,10 @@ type OrderRepo interface {
 	GetAllOrdersByUserId(ctx context.Context, userId int64) ([]model.Order, error)
 
 	PayOrder(ctx context.Context, userId, orderId int64, payedPrice float64) error
+
+	ApplyPromotionCodeToOrder(ctx context.Context, userId, orderId int64, promotionCode string) error
+	DeletePromotionCodeFromOrder(ctx context.Context, userId, orderId int64) error
+
+	GetShippingMethod(ctx context.Context) ([]model.ShippingMethod, error)
+	UpdateShippingMethod(ctx context.Context, userId, orderId, ShippingMethodName string) error
 }

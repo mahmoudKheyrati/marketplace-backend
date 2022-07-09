@@ -488,6 +488,10 @@ update "order" set applied_promotion_code = ? where id = ? and user_id = ? ;
 -- delete promotion code from oder
 update "order" set applied_promotion_code = null where id= ? and user_id = ? ;
 
+
+-- apply shipping method
+update "order" set shipping_method_id = ? where id= ? and user_id = ? ;
+
 -- create new order
 insert into "order"(user_id )
 values (?) returning id;
