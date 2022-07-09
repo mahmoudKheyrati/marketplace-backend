@@ -25,7 +25,8 @@ select id,
        national_id,
        permission_name,
        created_at
-from "user" where id = ?;
+from "user"
+where id = ?;
 -- add address for user
 insert into address(user_id, country, province, city, street, postal_code, home_phone_number)
 values (?, ?, ?, ?, ?, ?, ?);
@@ -55,7 +56,6 @@ values (?, ?, ?, ?, ?, ?, ?);
 commit;
 
 
-
 -- get all shipping method
 select name, expected_arrival_working_days, base_cost, created_at
 from shipping_method;
@@ -67,21 +67,35 @@ from category
 where parent is null;
 -- get all categories with sub-categories
 -- todo: implement later if needed.
-select id, name, parent from category order by id, parent;
+select id, name, parent
+from category
+order by id, parent;
 
 -- get subcategories by category_id
 with recursive cte as (
-    select id,name,parent from category where id = ?
+    select id, name, parent
+    from category
+    where id = ?
     union
-    select c2.id,c2.name,c2.parent from category c2 join cte as c1 on c2.parent=c1.id
-) select id, name, parent from cte;
+    select c2.id, c2.name, c2.parent
+    from category c2
+             join cte as c1 on c2.parent = c1.id
+)
+select id, name, parent
+from cte;
 
 -- get parents by category_id
 with recursive cte as (
-    select id,name,parent from category where id = ?
+    select id, name, parent
+    from category
+    where id = ?
     union
-    select c2.id,c2.name,c2.parent from category c2 join cte as c1 on c2.id=c1.parent
-) select id, name, parent from cte;
+    select c2.id, c2.name, c2.parent
+    from category c2
+             join cte as c1 on c2.id = c1.parent
+)
+select id, name, parent
+from cte;
 
 
 -- create store
@@ -93,19 +107,24 @@ update store
 set name= ?,
     description = ?,
     avatar_url = ?
-where id = ? and owner = ?;
+where id = ?
+  and owner = ?;
 
 -- get user all stores
 select id, name, description, avatar_url, owner, creator, created_at
 from store
-where creator = ? and deleted_at is null;
+where creator = ?
+  and deleted_at is null;
 
 -- get all marketplace stores
 select id, name, description, avatar_url, owner, creator, created_at
 from store
 where deleted_at is null;
 -- delete store
-update store set deleted_at = now() where id= ? and owner = ? ;
+update store
+set deleted_at = now()
+where id = ?
+  and owner = ?;
 
 -- add address for store
 insert into store_address (country, province, city, street, postal_code)
@@ -123,7 +142,7 @@ set country     =?,
     city= ?,
     street= ?,
     postal_code = ?
-where store_id = ? ;
+where store_id = ?;
 
 -- insert store category
 insert into store_category(category_id, store_id)
@@ -137,11 +156,16 @@ where category_id =?
 
 -- store add product
 insert into store_product(product_id, store_id, off_percent, max_off_price, price, available_count, warranty_id)
-values (?,?,?,?,?,?,?);
+values (?, ?, ?, ?, ?, ?, ?);
 -- update store product
 update store_product
-set off_percent= ?, max_off_price= ? , price = ?, available_count = ? , warranty_id = ?
-where store_id = ? and product_id= ? ;
+set off_percent= ?,
+    max_off_price= ?,
+    price = ?,
+    available_count = ?,
+    warranty_id = ?
+where store_id = ?
+  and product_id = ?;
 -- get all products of store
 select id,
        category_id,
@@ -151,7 +175,8 @@ select id,
        picture_url,
        specification,
        p.created_at as created_at
-from product p join store_product sp on p.id=sp.product_id;
+from product p
+         join store_product sp on p.id = sp.product_id;
 
 
 -- add product
@@ -291,6 +316,13 @@ where product_id = ?
 select id, name, type, month, created_at
 from warranty
 where id = ?;
+-- get warranty by store_product id
+select id, name, type, month, created_at
+from warranty
+where id in (select warranty_id from store_product where store_id = ? and product_id = ?)
+limit 1;
+
+
 
 -- add warranty
 insert into warranty(name, type, month)
@@ -340,7 +372,8 @@ values (?, ?, ?, ?, ?);
 -- todo: check if user by a product from store.
 -- update review
 update review
-set rate=?, review_text = ?
+set rate=?,
+    review_text = ?
 where id = ?
   and user_id=?
   and deleted_at is null;
