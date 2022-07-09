@@ -387,7 +387,13 @@ order by up_votes * 2 + down_votes desc;
 
 
 -- sort reviews by created date
-select *
+select id,
+       product_id,
+       store_id,
+       user_id,
+       rate,
+       review_text,
+       created_at
 from review
 where product_id = ?
   and deleted_at is null
