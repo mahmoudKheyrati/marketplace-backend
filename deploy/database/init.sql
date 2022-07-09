@@ -63,6 +63,11 @@ create table shipping_method
     base_cost                     int not null,
     created_at                    timestamptz default now()
 );
+-- shipping method
+insert into shipping_method (name, expected_arrival_working_days, base_cost)
+values ('ordinary', 7, 15),
+       ('express', 3, 35),
+       ('special', 1, 50);
 
 
 drop table if exists category cascade;
@@ -73,6 +78,20 @@ create table category
     parent     bigint references category (id),
     created_at timestamptz default now()
 );
+-- category
+insert into category(id, name, parent)
+values (1, 'electronics', null),
+       (2, 'laptop', 1),
+       (3, 'phone', 1),
+       (4, 'monitor', 1),
+       (5, 'shoes', null),
+       (6, 'men-shoes', 5),
+       (7, 'boot', 6),
+       (8, 'sneakers', 6),
+       (9, 'women-shoes', 5),
+       (10, 'boot', 9),
+       (11, 'sneakers', 9),
+       (12, 'flat', 9);
 
 
 drop table if exists store cascade;
