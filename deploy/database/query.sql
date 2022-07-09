@@ -62,13 +62,9 @@ from shipping_method;
 
 
 -- get main categories
-select name
+select id, name
 from category
 where parent is null;
--- get sub-categories by category id
-select name
-from category
-where parent = ?;
 -- get all categories with sub-categories
 -- todo: implement later if needed.
 select id, name, parent from category order by id, parent;
