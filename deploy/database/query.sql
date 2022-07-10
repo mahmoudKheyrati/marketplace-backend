@@ -122,7 +122,7 @@ where id = ?
 -- get user all stores
 select id, name, description, avatar_url, owner, creator, created_at
 from store
-where creator = ?
+where creator =? or owner = ?
   and deleted_at is null;
 
 -- get all marketplace stores
@@ -185,7 +185,8 @@ select id,
        specification,
        p.created_at as created_at
 from product p
-         join store_product sp on p.id = sp.product_id;
+         join store_product sp on p.id = sp.product_id
+where id = ?;
 
 
 -- add product
