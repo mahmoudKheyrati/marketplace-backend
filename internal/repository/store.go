@@ -17,21 +17,14 @@ type StoreRepo interface {
 	GetAllProductsByStoreId(ctx context.Context, storeId int64) ([]model.Product, error)
 
 	IsUserOwnerOfStore(ctx context.Context, userId, storeId int64) (bool, error)
-	// first check if the user is creator of store or not?
 	AddStoreAddress(ctx context.Context, userId, storeId int64, country, province, city, street, postalCode string) (int64, error)
-	// first check if the user is creator of store or not?
 	GetStoreAddressesByUserId(ctx context.Context, userId, storeId int64) ([]model.StoreAddress, error)
-	// first check if the user is creator of store or not?
 	UpdateStoreAddresses(ctx context.Context, userId, storeId int64, country, province, city, street, postalCode string) (int64, error)
 
-	// first check if the user is creator of store or not?
 	AddStoreCategory(ctx context.Context, userId, storeId, categoryId int64) error
-	// first check if the user is creator of store or not?
 	DeleteStoreCategory(ctx context.Context, userId, storeId, categoryId int64) error
 
-	// first check if the user is creator of store or not?
 	AddProductToStore(ctx context.Context, userId, storeId, productId, warrantyId int64, price, offPercent, maxOffPrice float64, availableCount int) error
-	// first check if the user is creator of store or not?
 	UpdateStoreProduct(ctx context.Context, userId, storeId, productId, warrantyId int64, price, offPercent, maxOffPrice float64, availableCount int) error
 }
 
