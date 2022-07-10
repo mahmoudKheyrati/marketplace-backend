@@ -61,7 +61,7 @@ func (t *TicketHandler) CreateTicket(c *fiber.Ctx) error {
 	ticketType := cast.ToInt64(c.Params("ticketTypeId"))
 
 	ticketId, err := t.ticketRepo.CreateTicket(ctx, ticketType, userId)
-	if err != nil {
+	if err != nil || ticketId == -1 {
 		pkg.Logger().Error(err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "can not create ticket"})
 	}

@@ -83,21 +83,12 @@ func (t *TicketRepoImpl) CreateTicket(ctx context.Context, ticketTypeId int64, u
 	query := `insert into ticket(user_id, ticket_type_id)
 values ($1, $2) returning id`
 
-	rows, err := t.db.Query(ctx, query, userId, ticketTypeId)
-	if err != nil {
-		return -1, err
-	}
-	for rows.Next() {
-		var id int64
-		err := rows.Scan(&id)
-		if err != nil {
-			return -1, err
-		}
-		if id != 0 {
-			return id, nil
-		}
-	}
-	return -1, nil
+	row := t.db.QueryRow(ctx, query, userId, ticketTypeId)
+
+	var id int64 = -1
+	err := row.Scan(&id)
+	return id, err
+
 }
 
 func (t *TicketRepoImpl) SendMessageToTicket(ctx context.Context, ticketId int64, senderId int64, text string) error {

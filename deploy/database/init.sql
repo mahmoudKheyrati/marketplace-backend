@@ -261,13 +261,17 @@ create table ticket_type
     is_last_version bool        default true,
     created_at      timestamptz default now()
 );
+insert into ticket_type(name, description)
+VALUES ('support', 'connect to support team'),
+       ('sell', 'connect to sell team'),
+       ('others', 'others');
 drop table if exists ticket cascade;
 create table ticket
 (
     id             bigserial primary key,
-    user_id        bigint                 not null references "user" (id) on update cascade,
-    employee_id    bigint      default -1 not null references "user" (id) on update cascade,
-    ticket_type_id bigint                 not null references ticket_type (id) on update cascade,
+    user_id        bigint not null references "user" (id) on update cascade,
+    employee_id    bigint references "user" (id) on update cascade,
+    ticket_type_id bigint not null references ticket_type (id) on update cascade,
     is_done        bool        default false,
     done_at        timestamptz,
     created_at     timestamptz default now()
