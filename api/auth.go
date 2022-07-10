@@ -25,7 +25,8 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 type JwtData struct {
-	UserId int64 `json:"user_id"`
+	UserId         int64  `json:"user_id"`
+	PermissionName string `json:"permission_name"`
 }
 
 func (a *AuthHandler) Login(c *fiber.Ctx) error {
@@ -47,7 +48,7 @@ func (a *AuthHandler) Login(c *fiber.Ctx) error {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
-	jwtData := JwtData{UserId: user.Id}
+	jwtData := JwtData{UserId: user.Id, PermissionName: user.PermissionName}
 	marshalledData, err := json.Marshal(jwtData)
 	if err != nil {
 		pkg.Logger().Error(err)

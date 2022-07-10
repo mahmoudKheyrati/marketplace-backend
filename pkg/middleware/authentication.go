@@ -35,6 +35,7 @@ func (a *AuthMiddleware) Protected() fiber.Handler {
 			}
 			c.Locals(pkg.JwtDataKey, jwtData)
 			c.Locals(pkg.UserIdKey, jwtData.UserId)
+			c.Locals(pkg.UserPermissionNameKey, jwtData.PermissionName)
 			return c.Next()
 		},
 		ErrorHandler: jwtError,
