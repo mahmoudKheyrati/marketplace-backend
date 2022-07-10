@@ -602,6 +602,10 @@ set is_done = true,
 where id = ?
   and employee_id = ?;
 
+-- get all unfinished tickets
+select id, user_id, employee_id, ticket_type_id, is_done, done_at, created_at
+from ticket where is_done = false order by created_at desc ;
+
 -- add ticket message
 insert into ticket_message(ticket_id, sender_id, message_text)
 values (?, ?, ?);
