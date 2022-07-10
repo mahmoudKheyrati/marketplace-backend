@@ -47,6 +47,7 @@ func main() {
 	categoryRepo := repository.NewCategoryRepoImpl(db)
 	productRepo := repository.NewProductRepoImpl(db)
 	warrantyRepo := repository.NewWarrantyRepoImpl(db)
+	storeRepo := repository.NewStoreRepoImpl(db)
 
 	// create api handlers
 	authHandler := api.NewAuthHandler(authRepo, cfg)
@@ -59,6 +60,7 @@ func main() {
 	categoryHandler := api.NewCategoryHandler(categoryRepo)
 	productHandler := api.NewProductHandler(productRepo)
 	warrantyHandler := api.NewWarrantyHandler(warrantyRepo)
+	storeHandler := api.NewStoreHandler(storeRepo)
 
 	authMiddleware := middleware.NewAuthMiddleware(cfg.JwtSecret)
 
@@ -140,6 +142,23 @@ func main() {
 		warranty.Post("/create", authMiddleware.Protected(), warrantyHandler.CreateWarranty)
 		warranty.Get("/:warrantyId", warrantyHandler.GetWarrantyByWarrantyId)
 		warranty.Get("/product/:productId/:storeId", warrantyHandler.GetStoreProductWarranty)
+	}
+	stores := v2.Group("/stores", authMiddleware.Protected())
+	{
+		stores.Post("/create", storeHandler.CreateStore)
+		stores.Post("/update/:storeId", storeHandler.UpdateStore)
+		stores.Delete("/delete/:storeId", storeHandler.DeleteStore)
+		stores.Get("/me", storeHandler.GetMyStores)
+		stores.Get("/:storeId", storeHandler.GetStoreByStoreId)
+		stores.Get("/", storeHandler.GetAllStores)
+		stores.Get("/products/:storeId", storeHandler.GetAllProductsByStoreId)
+		stores.Post("/products/:storeId/create", storeHandler.AddProductToStore)
+		stores.Post("/products/:storeId/update", storeHandler.UpdateStoreProduct)
+		stores.Post("/addresses/:storeId/create", storeHandler.AddStoreAddress)
+		stores.Get("/addresses/:storeId", storeHandler.GetStoreAddressesByStoreId)
+		stores.Post("/addresses/:storeId/update", storeHandler.UpdateStoreAddresses)
+		stores.Post("/categories/:storeId/:categoryId/create", storeHandler.AddStoreCategory)
+		stores.Delete("/categories/:storeId/:categoryId/delete", storeHandler.DeleteStoreCategory)
 	}
 
 	log.Fatal(app.Listen(fmt.Sprintf(":%d", cfg.Port)))

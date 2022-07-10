@@ -16,20 +16,6 @@ func NewStoreHandler(storeRepo repository.StoreRepo) *StoreHandler {
 	return &StoreHandler{storeRepo: storeRepo}
 }
 
-func (s *StoreHandler) GetStoreByStoreId(c *fiber.Ctx) error {
-	ctx := context.Background()
-
-	storeId := cast.ToInt64(c.Params("storeId"))
-
-	store, err := s.storeRepo.GetStoreByStoreId(ctx, storeId)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "can not "})
-	}
-
-	return c.JSON(fiber.Map{"store": store, "status": "ok"})
-
-}
-
 type StoreRequest struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
@@ -98,7 +84,7 @@ func (s *StoreHandler) DeleteStore(c *fiber.Ctx) error {
 
 }
 
-func (s *StoreHandler) GetStoresByUserId(c *fiber.Ctx) error {
+func (s *StoreHandler) GetMyStores(c *fiber.Ctx) error {
 	ctx := context.Background()
 
 	userId := c.Locals(pkg.UserIdKey).(int64)
@@ -109,6 +95,20 @@ func (s *StoreHandler) GetStoresByUserId(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{"stores": stores, "status": "ok"})
+}
+
+func (s *StoreHandler) GetStoreByStoreId(c *fiber.Ctx) error {
+	ctx := context.Background()
+
+	storeId := cast.ToInt64(c.Params("storeId"))
+
+	store, err := s.storeRepo.GetStoreByStoreId(ctx, storeId)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "can not "})
+	}
+
+	return c.JSON(fiber.Map{"store": store, "status": "ok"})
+
 }
 
 func (s *StoreHandler) GetAllStores(c *fiber.Ctx) error {
