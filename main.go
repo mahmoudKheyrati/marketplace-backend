@@ -86,6 +86,7 @@ func main() {
 		//tickets.Post("/received/:ticketId/:messageId")
 		//tickets.Post("/seen/:ticketId/:messageId")
 		tickets.Get("/chats/:ticketId", ticketHandler.LoadTicketMessages)
+		tickets.Get("/unfinished", ticketHandler.GetAllUnfinishedTickets)
 	}
 	users := v2.Group("/users", authMiddleware.Protected())
 	{

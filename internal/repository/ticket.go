@@ -13,6 +13,8 @@ type TicketRepo interface {
 	CreateTicket(ctx context.Context, ticketTypeId int64, userId int64) (int64, error)
 	SendMessageToTicket(ctx context.Context, ticketId int64, senderId int64, text string) error
 	GetTicketMessages(ctx context.Context, ticketId int64, userId int64, offset int64) ([]model.TicketMessage, error)
+
+	GetAllUnFinishedTickets(ctx context.Context) ([]model.Ticket, error)
 }
 
 type TicketRepoImpl struct {
@@ -147,4 +149,30 @@ limit 5 offset $2`
 		ticketMessages = append(ticketMessages, ticketMessage)
 	}
 	return ticketMessages, nil
+}
+
+func (t *TicketRepoImpl) GetAllUnFinishedTickets(ctx context.Context) ([]model.Ticket, error) {
+	query := `select id, user_id, employee_id, ticket_type_id, is_done, done_at, created_at
+from ticket where is_done = false order by created_at desc`
+	rows, err := t.db.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	tickets := make([]model.Ticket, 0)
+	for rows.Next() {
+		ticket := model.Ticket{}
+		err := rows.Scan(
+			&ticket.Id,
+			&ticket.UserId,
+			&ticket.EmployeeId,
+			&ticket.TicketTypeId,
+			&ticket.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		tickets = append(tickets, ticket)
+	}
+
+	return tickets, nil
 }

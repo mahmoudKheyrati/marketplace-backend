@@ -28,6 +28,21 @@ func (t *TicketHandler) GetAllTickets(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"tickets": tickets})
 }
 
+func (t *TicketHandler) GetAllUnfinishedTickets(c *fiber.Ctx) error {
+	ctx := context.Background()
+	permissionName := c.Locals(pkg.UserPermissionNameKey).(string)
+
+	if permissionName != "marketplace-admin" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": "you don't have access"})
+	}
+	tickets, err := t.ticketRepo.GetAllUnFinishedTickets(ctx)
+	if err != nil {
+		pkg.Logger().Error(err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "can not get tickets"})
+	}
+	return c.JSON(fiber.Map{"tickets": tickets})
+}
+
 func (t *TicketHandler) GetAllTicketTypes(c *fiber.Ctx) error {
 	ctx := context.Background()
 
