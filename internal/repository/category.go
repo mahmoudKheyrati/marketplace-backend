@@ -17,6 +17,10 @@ type CategoryRepoImpl struct {
 	db *pgxpool.Pool
 }
 
+func NewCategoryRepoImpl(db *pgxpool.Pool) *CategoryRepoImpl {
+	return &CategoryRepoImpl{db: db}
+}
+
 func (c *CategoryRepoImpl) GetMainCategories(ctx context.Context) ([]model.Category, error) {
 	query := `select id, name, parent
 from category

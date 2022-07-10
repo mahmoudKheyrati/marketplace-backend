@@ -44,6 +44,7 @@ func main() {
 	addressRepo := repository.NewAddressRepoImpl(db)
 	voteRepo := repository.NewVoteRepoImpl(db)
 	reviewRepo := repository.NewReviewRepoImpl(db)
+	categoryRepo := repository.NewCategoryRepoImpl(db)
 
 	authHandler := api.NewAuthHandler(authRepo, cfg)
 	notificationHandler := api.NewNotificationHandler(notificationRepo)
@@ -52,6 +53,7 @@ func main() {
 	addressHandler := api.NewAddressHandler(addressRepo)
 	voteHandler := api.NewVoteHandler(voteRepo)
 	reviewHandler := api.NewReviewHandler(reviewRepo)
+	categoryHandler := api.NewCategoryHandler(categoryRepo)
 
 	authMiddleware := middleware.NewAuthMiddleware(cfg.JwtSecret)
 
@@ -111,6 +113,13 @@ func main() {
 		reviews.Delete("/delete/:reviewId", reviewHandler.DeleteReview)
 		reviews.Get("/me", reviewHandler.GetUserAllReviews)
 		reviews.Get("/product/:productId", reviewHandler.GetProductReviews)
+	}
+	categories := v2.Group("/categories")
+	{
+		categories.Get("/", categoryHandler.GetAllCategories)
+		categories.Get("/main", categoryHandler.GetMainCategories)
+		categories.Get("/subs/:categoryId", categoryHandler.GetSubCategoriesByCategoryId)
+		categories.Get("/parents/:categoryId", categoryHandler.GetParentsByCategoryId)
 	}
 
 	log.Fatal(app.Listen(fmt.Sprintf(":%d", cfg.Port)))
