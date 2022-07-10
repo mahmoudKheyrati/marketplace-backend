@@ -46,7 +46,9 @@ func main() {
 	reviewRepo := repository.NewReviewRepoImpl(db)
 	categoryRepo := repository.NewCategoryRepoImpl(db)
 	productRepo := repository.NewProductRepoImpl(db)
+	warrantyRepo := repository.NewWarrantyRepoImpl(db)
 
+	// create api handlers
 	authHandler := api.NewAuthHandler(authRepo, cfg)
 	notificationHandler := api.NewNotificationHandler(notificationRepo)
 	ticketHandler := api.NewTicketHandler(ticketRepo)
@@ -56,6 +58,7 @@ func main() {
 	reviewHandler := api.NewReviewHandler(reviewRepo)
 	categoryHandler := api.NewCategoryHandler(categoryRepo)
 	productHandler := api.NewProductHandler(productRepo)
+	warrantyHandler := api.NewWarrantyHandler(warrantyRepo)
 
 	authMiddleware := middleware.NewAuthMiddleware(cfg.JwtSecret)
 
@@ -131,6 +134,12 @@ func main() {
 		products.Get("/brands/:categoryId", productHandler.GetBrandsByCategoryId)
 		products.Get("/price_range/:categoryId", productHandler.GetPriceRangeByCategoryId)
 		products.Get("/specifications/:categoryId", productHandler.GetSpecificationsByCategoryId)
+	}
+	warranty := v2.Group("/warranty")
+	{
+		warranty.Post("/create", authMiddleware.Protected(), warrantyHandler.CreateWarranty)
+		warranty.Get("/:warrantyId", warrantyHandler.GetWarrantyByWarrantyId)
+		warranty.Get("/product/:productId/:storeId", warrantyHandler.GetStoreProductWarranty)
 	}
 
 	log.Fatal(app.Listen(fmt.Sprintf(":%d", cfg.Port)))
