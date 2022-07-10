@@ -104,11 +104,14 @@ select product_id,
        max_off_price,
        price,
        available_count,
-       warranty_id,
-       created_at
+       store_product.created_at, 
+       w.name as warranty_name, 
+       w.type as warranty_type, 
+       w.month as warranty_month
 from store_product
+left join warranty w on store_product.warranty_id = w.id
 where product_id = $1
-  and available_count > 0 and is_last_version = true
+  and available_count > 0 and is_last_version = true;
 `
 	rows, err := p.db.Query(ctx, query, productId)
 	if err != nil {
@@ -117,10 +120,19 @@ where product_id = $1
 	var storeProducts = make([]model.StoreProduct, 0)
 	for rows.Next() {
 		var storeProduct model.StoreProduct
+		var warrantyName, warrantyType *string
+		var warrantyMonth *int
 		err := rows.Scan(&storeProduct.ProductId, &storeProduct.StoreId, &storeProduct.OffPercent, &storeProduct.MaxOffPrice, &storeProduct.Price,
-			&storeProduct.AvailableCount, &storeProduct.WarrantyId, &storeProduct.CreatedAt)
+			&storeProduct.AvailableCount, &storeProduct.CreatedAt, &warrantyName, &warrantyType, &warrantyMonth)
 		if err != nil {
 			return nil, err
+		}
+		if warrantyName != nil && warrantyType != nil && warrantyMonth != nil {
+			storeProduct.Warranty = &model.Warranty{
+				Name:         *warrantyName,
+				WarrantyType: *warrantyType,
+				Month:        *warrantyMonth,
+			}
 		}
 		storeProducts = append(storeProducts, storeProduct)
 	}

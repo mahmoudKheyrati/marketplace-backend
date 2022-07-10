@@ -10,5 +10,6 @@ type StoreProduct struct {
 	Price          float64   `json:"price"`
 	AvailableCount int       `json:"available_count"`
 	WarrantyId     *int64    `json:"warranty_id"`
+	Warranty       *Warranty `json:"warranty"`
 	CreatedAt      time.Time `json:"created_at"`
 }

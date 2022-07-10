@@ -337,8 +337,12 @@ select product_id,
        price,
        available_count,
        warranty_id,
-       created_at
+       store_product.created_at,
+       w.name as warranty_name,
+       w.type as warranty_type,
+       w.month as warranty_month
 from store_product
+left join warranty w on store_product.warranty_id = w.id
 where product_id = ?
   and available_count > 0 and is_last_version = true;
 
