@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/mahmoudKheyrati/marketplace-backend/internal/repository"
 	"github.com/mahmoudKheyrati/marketplace-backend/pkg"
@@ -27,7 +26,6 @@ func (w *WarrantyHandler) CreateWarranty(c *fiber.Ctx) error {
 	ctx := context.Background()
 
 	permissionName := c.Locals(pkg.UserPermissionNameKey).(string)
-	fmt.Println(permissionName)
 	if permissionName != "store-admin" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": "you don't have access"})
 	}
