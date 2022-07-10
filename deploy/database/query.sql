@@ -366,6 +366,9 @@ values (?, ?, ?);
 delete
 from warranty
 where id = ?;
+-- get warranty by warranty_id
+select id, name, type, month, created_at
+from warranty where id = ?;
 
 -- get product category
 with recursive cte as (
