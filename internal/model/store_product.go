@@ -9,6 +9,6 @@ type StoreProduct struct {
 	MaxOffPrice    float64   `json:"max_off_price"`
 	Price          float64   `json:"price"`
 	AvailableCount int       `json:"available_count"`
-	WarrantyId     int64     `json:"warranty_id"`
+	WarrantyId     *int64    `json:"warranty_id"`
 	CreatedAt      time.Time `json:"created_at"`
 }

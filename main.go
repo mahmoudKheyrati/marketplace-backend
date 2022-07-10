@@ -45,6 +45,7 @@ func main() {
 	voteRepo := repository.NewVoteRepoImpl(db)
 	reviewRepo := repository.NewReviewRepoImpl(db)
 	categoryRepo := repository.NewCategoryRepoImpl(db)
+	productRepo := repository.NewProductRepoImpl(db)
 
 	authHandler := api.NewAuthHandler(authRepo, cfg)
 	notificationHandler := api.NewNotificationHandler(notificationRepo)
@@ -54,6 +55,7 @@ func main() {
 	voteHandler := api.NewVoteHandler(voteRepo)
 	reviewHandler := api.NewReviewHandler(reviewRepo)
 	categoryHandler := api.NewCategoryHandler(categoryRepo)
+	productHandler := api.NewProductHandler(productRepo)
 
 	authMiddleware := middleware.NewAuthMiddleware(cfg.JwtSecret)
 
@@ -120,6 +122,15 @@ func main() {
 		categories.Get("/main", categoryHandler.GetMainCategories)
 		categories.Get("/subs/:categoryId", categoryHandler.GetSubCategoriesByCategoryId)
 		categories.Get("/parents/:categoryId", categoryHandler.GetParentsByCategoryId)
+	}
+	products := v2.Group("/products")
+	{
+		products.Get("/:productId", productHandler.GetProductByProductId)
+		products.Get("/category/:categoryId", productHandler.GetProductsByCategoryId)
+		products.Get("/stores/:productId", productHandler.GetAllStoreProductsByProductId)
+		products.Get("/brands/:categoryId", productHandler.GetBrandsByCategoryId)
+		products.Get("/price_range/:categoryId", productHandler.GetPriceRangeByCategoryId)
+		products.Get("/specifications/:categoryId", productHandler.GetSpecificationsByCategoryId)
 	}
 
 	log.Fatal(app.Listen(fmt.Sprintf(":%d", cfg.Port)))
