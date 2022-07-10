@@ -18,7 +18,7 @@ type StoreRepo interface {
 
 	IsUserOwnerOfStore(ctx context.Context, userId, storeId int64) (bool, error)
 	AddStoreAddress(ctx context.Context, userId, storeId int64, country, province, city, street, postalCode string) (int64, error)
-	GetStoreAddressesByUserId(ctx context.Context, userId, storeId int64) ([]model.StoreAddress, error)
+	GetStoreAddressesByStoreId(ctx context.Context, userId, storeId int64) ([]model.StoreAddress, error)
 	UpdateStoreAddresses(ctx context.Context, userId, storeId int64, country, province, city, street, postalCode string) (int64, error)
 
 	AddStoreCategory(ctx context.Context, userId, storeId, categoryId int64) error
@@ -204,7 +204,7 @@ values ($1, $2, $3, $4, $5) returning id
 
 }
 
-func (s *StoreRepoImpl) GetStoreAddressesByUserId(ctx context.Context, userId, storeId int64) ([]model.StoreAddress, error) {
+func (s *StoreRepoImpl) GetStoreAddressesByStoreId(ctx context.Context, userId, storeId int64) ([]model.StoreAddress, error) {
 	err := s.mustUserOwnerOfStore(ctx, userId, storeId)
 	if err != nil {
 		return nil, err
