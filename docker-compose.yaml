@@ -7,47 +7,57 @@ services:
       dockerfile: ./deploy/Dockerfile
     ports:
       - "4040:4040"
+      - "3000:3000"
     env_file:
       - .env
     depends_on:
-      - postgres
-      - pgadmin
+      - postgresql-master
+      - postgresql-slave
+
     networks:
       - postgres
 
-  postgres:
-    container_name: postgres_container
-    image: postgres
-    env_file:
-      - .env
-    volumes:
-      - postgres:/data/postgres
+  postgresql-master:
+    image: docker.io/bitnami/postgresql:14
     ports:
-      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
-    networks:
-      - postgres
-    domainname: postgres
-    restart: unless-stopped
-
-  pgadmin:
-    container_name: pgadmin_container
-    image: dpage/pgadmin4
-    env_file:
-      - .env
+      - '5432'
     volumes:
-      - pgadmin:/var/lib/pgadmin
-
-    ports:
-      - "5050:80"
+      - 'postgresql_master_data:/bitnami/postgresql'
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=master
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTGRESQL_REPLICATION_PASSWORD=repl_password
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=password
+      - POSTGRESQL_DATABASE=marketplace
+      - ALLOW_EMPTY_PASSWORD=yes
     networks:
       - postgres
-    restart: unless-stopped
-
+  postgresql-slave:
+    image: docker.io/bitnami/postgresql:14
+    ports:
+      - '5432'
+    volumes:
+      - 'postgresql_slave_data:/bitnami/postgresql'
+    depends_on:
+      - postgresql-master
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=slave
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTGRESQL_REPLICATION_PASSWORD=repl_password
+      - POSTGRESQL_MASTER_HOST=postgresql-master
+      - POSTGRESQL_PASSWORD=password
+      - POSTGRESQL_MASTER_PORT_NUMBER=5432
+      - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - postgres
 networks:
   postgres:
     driver: bridge
 
 volumes:
-  postgres:
-  pgadmin:
+  postgresql_master_data:
+    driver: local
+  postgresql_slave_data:
+    driver: local
 

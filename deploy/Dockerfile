@@ -1,4 +1,4 @@
-FROM golang:1.13-buster AS build
+FROM golang:1.15-buster AS build
 
 WORKDIR /app
 
@@ -15,6 +15,7 @@ FROM gcr.io/distroless/base-debian10
 
 WORKDIR /
 
+COPY --from=build /app/.env /app/.env
 COPY --from=build /app/marketplace-application /app/marketplace-application
 
 EXPOSE 4040

@@ -80,6 +80,7 @@ func (a *AuthHandler) Signup(c *fiber.Ctx) error {
 	}
 	err := a.authRepo.SignUp(context.Background(), request.Email, request.Password, request.PhoneNumber, request.FirstName, request.LastName)
 	if err != nil {
+		pkg.Logger().Error(err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "can not make user!. change your input"})
 	}
 
