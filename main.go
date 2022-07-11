@@ -110,6 +110,7 @@ func main() {
 	users := v2.Group("/users", authMiddleware.Protected())
 	{
 		users.Get("/me", userHandler.GetMyProfile)
+		users.Get("/:userId", userHandler.GetUserByUserId)
 	}
 	addresses := v2.Group("addresses", authMiddleware.Protected())
 	{
