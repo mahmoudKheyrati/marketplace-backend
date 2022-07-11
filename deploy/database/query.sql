@@ -360,7 +360,7 @@ select p.id,
        p.specification,
        avg(r.rate) as rate
 from product p
-         join review r on p.id = r.product_id
+         left join review r on p.id = r.product_id
 where p.category_id = ?
 group by p.id, p.category_id, p.name, p.brand, p.description, p.picture_url, p.specification
 order by avg(r.rate) desc;
@@ -386,7 +386,7 @@ select id,
 from product
 where id = ?;
 
--- get all store-products that have this product
+-- get all store-products that have a specific product
 select product_id,
        store_id,
        off_percent,
@@ -431,7 +431,7 @@ with recursive cte as (
     select c.id, c.name, c.parent
     from product p
              join category c on p.category_id = c.id
-    where p.id = 3
+    where p.id = ?
     union
     select c.id, c.name, c.parent
     from category c

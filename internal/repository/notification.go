@@ -41,7 +41,7 @@ from product_available_subscription where user_id = $1 and is_notification_sent 
 }
 
 func (n *NotificationRepoImpl) GetPendingNotifications(ctx context.Context, userId int64) ([]int64, error) {
-	query := `select product_id, user_id, created_at, is_notification_sent
+	query := `select product_id
 from product_available_subscription
 where user_id = $1
   and available_status = false
