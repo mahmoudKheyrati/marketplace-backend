@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/mahmoudKheyrati/marketplace-backend/internal/repository"
 	"github.com/mahmoudKheyrati/marketplace-backend/pkg"
@@ -26,6 +27,21 @@ func (a *AddressHandler) GetAllAddresses(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "can not get user addresses."})
 	}
 	return c.JSON(fiber.Map{"status": "ok", "addresses": id})
+}
+
+func (a *AddressHandler) GetAddressByAddressId(c *fiber.Ctx) error {
+	ctx := context.Background()
+
+	userId := c.Locals(pkg.UserIdKey).(int64)
+	addressId := cast.ToInt64(c.Params("addressId"))
+	fmt.Println(userId, addressId)
+
+	id, err := a.addressRepo.GetAddressById(ctx, userId, addressId)
+	if err != nil {
+		pkg.Logger().Error(err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "can not get user address by addressId."})
+	}
+	return c.JSON(fiber.Map{"status": "ok", "address": id})
 }
 
 type AddressRequest struct {

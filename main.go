@@ -115,6 +115,7 @@ func main() {
 	addresses := v2.Group("addresses", authMiddleware.Protected())
 	{
 		addresses.Get("/", addressHandler.GetAllAddresses)
+		addresses.Get("/:addressId", addressHandler.GetAddressByAddressId)
 		addresses.Post("/create", addressHandler.CreateAddress)
 		addresses.Post("/update/:addressId", addressHandler.UpdateAddress)
 		addresses.Delete("/delete/:addressId", addressHandler.DeleteAddress)

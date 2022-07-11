@@ -9,6 +9,7 @@ import (
 
 type AddressRepo interface {
 	CreateAddress(ctx context.Context, userId int64, country, province, city, street, postalCode, homePhoneNumber string) (int64, error)
+	GetAddressById(ctx context.Context, userId, addressId int64) (*model.Address, error)
 	GetUserAddressesByUserId(ctx context.Context, userId int64) ([]model.Address, error)
 	UpdateUserAddress(ctx context.Context, userId int64, addressId int64, country, province, city, street, postalCode, homePhoneNumber string) (int64, error)
 	DeleteUserAddress(ctx context.Context, userId int64, addressId int64) error
@@ -34,6 +35,35 @@ values ($1, $2, $3, $4, $5, $6, $7) returning id`
 	var id int64 = -1
 	err = rows.Scan(&id)
 	return id, err
+}
+
+func (a *AddressRepoImpl) GetAddressById(ctx context.Context, userId, addressId int64) (*model.Address, error) {
+	query := `select id,
+       user_id,
+       country,
+       province,
+       city,
+       street,
+       postal_code,
+       home_phone_number,
+       created_at
+from address
+where user_id = $1 and id = $2
+  and is_last_version = true limit 1;
+`
+	row := a.db.QueryRow(ctx, query, userId, addressId)
+	var address model.Address
+	err := row.Scan(
+		&address.Id,
+		&address.UserId,
+		&address.Country,
+		&address.Province,
+		&address.City,
+		&address.Street,
+		&address.PostalCode,
+		&address.HomePhoneNumber,
+		&address.CreatedAt)
+	return &address, err
 }
 
 func (a *AddressRepoImpl) GetUserAddressesByUserId(ctx context.Context, userId int64) ([]model.Address, error) {
