@@ -11,7 +11,9 @@ import (
 	"github.com/mahmoudKheyrati/marketplace-backend/config"
 	"github.com/mahmoudKheyrati/marketplace-backend/internal/repository"
 	"github.com/mahmoudKheyrati/marketplace-backend/pkg"
+	"github.com/mahmoudKheyrati/marketplace-backend/pkg/metric"
 	"github.com/mahmoudKheyrati/marketplace-backend/pkg/middleware"
+	"github.com/mahmoudKheyrati/marketplace-backend/pkg/prometheus"
 	"go.uber.org/zap"
 	"log"
 )
@@ -25,6 +27,10 @@ func main() {
 			log.Fatalln(err)
 		}
 	}(zapLogger) // flush logs if any
+
+	metrics := metric.GetMetrics()
+	prom := prometheus.NewPrometheus(3000)
+	go prom.RunHTTPServer()
 
 	cfg := config.NewConfig()
 	db := pkg.CreateNewPostgresConnection(pkg.PostgresConfig{
@@ -62,12 +68,16 @@ func main() {
 	warrantyHandler := api.NewWarrantyHandler(warrantyRepo)
 	storeHandler := api.NewStoreHandler(storeRepo)
 
+	// create middlewares
 	authMiddleware := middleware.NewAuthMiddleware(cfg.JwtSecret)
+	metricMiddleware := middleware.NewMetricsMiddleware(metrics)
 
 	app := fiber.New()
 	app.Use(recover.New())
 	app.Use(cors.New())
 	app.Use(logger.New())
+	app.Use(metricMiddleware.MetricsMiddleware)
+	//app.Use(metricsMiddleware.MetricsMiddleware)
 	app.Get("/metrics", monitor.New(monitor.Config{Title: "MyService Metrics Page"}))
 
 	apiRoute := app.Group("/api")
