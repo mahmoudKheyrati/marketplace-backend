@@ -146,6 +146,7 @@ func main() {
 	{
 		products.Get("/:productId", productHandler.GetProductByProductId)
 		products.Get("/similar/:productId", productHandler.GetSimilarProducts)
+		products.Get("/frequently_bought_together/:productId", productHandler.GetFrequentlyBoughtTogetherProducts)
 		products.Get("/category/:categoryId", productHandler.GetProductsByCategoryId)
 		products.Get("/stores/:productId", productHandler.GetAllStoreProductsByProductId)
 		products.Get("/brands/:categoryId", productHandler.GetBrandsByCategoryId)

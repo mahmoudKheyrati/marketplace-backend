@@ -258,7 +258,34 @@ with cte as (
         created_at
 from cte order by sum desc limit 10;
 
+-- get frequently bought together products
+with cte as (
+    select p.id,
+           category_id,
+           name,
+           brand,
+           description,
+           picture_url,
+           specification,
+           p.created_at,
+           count(po.quantity) as co
 
+    from product p
+             left join product_order po on p.id = po.product_id
+             left join "order" o on o.id = po.order_id
+
+    where p.id = ? and o.is_paid = true and payed_price != 0 and pay_date is not null
+    group by p.id, category_id, name, brand, description, picture_url, specification, p.created_at
+
+)select id,
+        category_id,
+        name,
+        brand,
+        description,
+        picture_url,
+        specification,
+        created_at
+from cte order by co desc limit 10;
 
 
 -- get distinct brand by categoryId

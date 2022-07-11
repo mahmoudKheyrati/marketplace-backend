@@ -32,12 +32,24 @@ func (p *ProductHandler) GetSimilarProducts(c *fiber.Ctx) error {
 	ctx := context.Background()
 	productId := cast.ToInt64(c.Params("productId"))
 
-	product, err := p.productRepo.GetSimilarProducts(ctx, productId)
+	products, err := p.productRepo.GetSimilarProducts(ctx, productId)
 	if err != nil {
 		pkg.Logger().Error(err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "can not get product by productId"})
 	}
-	return c.JSON(fiber.Map{"product": product, "status": "ok"})
+	return c.JSON(fiber.Map{"products": products, "status": "ok"})
+}
+
+func (p *ProductHandler) GetFrequentlyBoughtTogetherProducts(c *fiber.Ctx) error {
+	ctx := context.Background()
+	productId := cast.ToInt64(c.Params("productId"))
+
+	products, err := p.productRepo.GetFrequentlyBoughtTogetherProducts(ctx, productId)
+	if err != nil {
+		pkg.Logger().Error(err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "can not get product by productId"})
+	}
+	return c.JSON(fiber.Map{"products": products, "status": "ok"})
 }
 
 func (p *ProductHandler) GetProductsByCategoryId(c *fiber.Ctx) error {

@@ -12,6 +12,8 @@ type ProductRepo interface {
 	GetAllStoreProductsByProductId(ctx context.Context, productId int64) ([]model.StoreProduct, error) // product available in the stores
 
 	GetSimilarProducts(ctx context.Context, productId int64) ([]model.Product, error)
+	GetFrequentlyBoughtTogetherProducts(ctx context.Context, productId int64) ([]model.Product, error)
+
 	GetBrandsByCategoryId(ctx context.Context, categoryId int64) ([]string, error)
 	GetPriceRangeByCategoryId(ctx context.Context, categoryId int64) (float64, float64, error)
 	GetSpecificationsByCategoryId(ctx context.Context, categoryId int64) ([]string, error)
@@ -170,6 +172,58 @@ with cte as (
         specification,
         created_at
 from cte order by sum desc limit 10;
+`
+	rows, err := p.db.Query(ctx, query, product.CategoryId)
+	if err != nil {
+		return nil, err
+	}
+	var products = make([]model.Product, 0)
+	for rows.Next() {
+		var product model.Product
+		err := rows.Scan(&product.Id, &product.CategoryId, &product.Name, &product.Brand, &product.Description, &product.PictureUrl,
+			&product.Specification, &product.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		products = append(products, product)
+	}
+	return products, nil
+}
+
+func (p *ProductRepoImpl) GetFrequentlyBoughtTogetherProducts(ctx context.Context, productId int64) ([]model.Product, error) {
+	product, err := p.GetProductByProductId(ctx, productId)
+	if err != nil {
+		return nil, err
+	}
+
+	query := `
+with cte as (
+    select p.id,
+           category_id,
+           name,
+           brand,
+           description,
+           picture_url,
+           specification,
+           p.created_at,
+           count(po.quantity) as co
+
+    from product p
+             left join product_order po on p.id = po.product_id
+             left join "order" o on o.id = po.order_id
+
+    where p.id =$1 and o.is_paid = true and payed_price != 0 and pay_date is not null
+    group by p.id, category_id, name, brand, description, picture_url, specification, p.created_at
+
+)select id,
+        category_id,
+        name,
+        brand,
+        description,
+        picture_url,
+        specification,
+        created_at
+from cte order by co desc limit 10;
 `
 	rows, err := p.db.Query(ctx, query, product.CategoryId)
 	if err != nil {
