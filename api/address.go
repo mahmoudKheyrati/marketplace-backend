@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/mahmoudKheyrati/marketplace-backend/internal/repository"
 	"github.com/mahmoudKheyrati/marketplace-backend/pkg"
@@ -34,7 +33,6 @@ func (a *AddressHandler) GetAddressByAddressId(c *fiber.Ctx) error {
 
 	userId := c.Locals(pkg.UserIdKey).(int64)
 	addressId := cast.ToInt64(c.Params("addressId"))
-	fmt.Println(userId, addressId)
 
 	id, err := a.addressRepo.GetAddressById(ctx, userId, addressId)
 	if err != nil {
