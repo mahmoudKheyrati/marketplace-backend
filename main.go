@@ -163,7 +163,7 @@ func main() {
 		stores.Get("/", storeHandler.GetAllStores)
 		stores.Get("/products/:storeId", storeHandler.GetAllProductsByStoreId)
 		stores.Post("/products/:storeId/create", storeHandler.AddProductToStore)
-		stores.Post("/products/:storeId/update", storeHandler.UpdateStoreProduct)
+		stores.Post("/products/:storeId/:addressId/update", storeHandler.UpdateStoreProduct)
 		stores.Post("/addresses/:storeId/create", storeHandler.AddStoreAddress)
 		stores.Get("/addresses/:storeId", storeHandler.GetStoreAddressesByStoreId)
 		stores.Post("/addresses/:storeId/update", storeHandler.UpdateStoreAddresses)

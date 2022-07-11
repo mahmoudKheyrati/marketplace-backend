@@ -192,6 +192,7 @@ func (s *StoreHandler) UpdateStoreAddresses(c *fiber.Ctx) error {
 
 	userId := c.Locals(pkg.UserIdKey).(int64)
 	storeId := cast.ToInt64(c.Params("storeId"))
+	addressId := cast.ToInt64(c.Params("addressId"))
 
 	permissionName := c.Locals(pkg.UserPermissionNameKey).(string)
 	if permissionName != "store-admin" {
@@ -202,7 +203,7 @@ func (s *StoreHandler) UpdateStoreAddresses(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "error in parsing request body"})
 	}
 
-	storeAddressId, err := s.storeRepo.UpdateStoreAddresses(ctx, userId, storeId, request.Country, request.Province, request.City, request.Street, request.PostalCode)
+	storeAddressId, err := s.storeRepo.UpdateStoreAddresses(ctx, userId, storeId, addressId, request.Country, request.Province, request.City, request.Street, request.PostalCode)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "can not "})
 	}

@@ -19,7 +19,7 @@ type StoreRepo interface {
 	IsUserOwnerOfStore(ctx context.Context, userId, storeId int64) (bool, error)
 	AddStoreAddress(ctx context.Context, userId, storeId int64, country, province, city, street, postalCode string) (int64, error)
 	GetStoreAddressesByStoreId(ctx context.Context, userId, storeId int64) ([]model.StoreAddress, error)
-	UpdateStoreAddresses(ctx context.Context, userId, storeId int64, country, province, city, street, postalCode string) (int64, error)
+	UpdateStoreAddresses(ctx context.Context, userId, storeId, addressId int64, country, province, city, street, postalCode string) (int64, error)
 
 	AddStoreCategory(ctx context.Context, userId, storeId, categoryId int64) error
 	DeleteStoreCategory(ctx context.Context, userId, storeId, categoryId int64) error
@@ -231,7 +231,7 @@ where store_id = $1;
 	return storeAddresses, nil
 }
 
-func (s *StoreRepoImpl) UpdateStoreAddresses(ctx context.Context, userId, storeId int64, country, province, city, street, postalCode string) (int64, error) {
+func (s *StoreRepoImpl) UpdateStoreAddresses(ctx context.Context, userId, storeId, addressId int64, country, province, city, street, postalCode string) (int64, error) {
 	err := s.mustUserOwnerOfStore(ctx, userId, storeId)
 	if err != nil {
 		return -1, err
@@ -243,10 +243,10 @@ set country = $1,
     city= $3,
     street= $4,
     postal_code = $5
-where store_id = $6
+where store_id = $6 and id = $7
 returning id
 `
-	row := s.db.QueryRow(ctx, query, country, province, city, street, postalCode, storeId)
+	row := s.db.QueryRow(ctx, query, country, province, city, street, postalCode, storeId, addressId)
 	var id int64 = -1
 	err = row.Scan(&id)
 	return id, err
