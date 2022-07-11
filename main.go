@@ -54,6 +54,7 @@ func main() {
 	productRepo := repository.NewProductRepoImpl(db)
 	warrantyRepo := repository.NewWarrantyRepoImpl(db)
 	storeRepo := repository.NewStoreRepoImpl(db)
+	orderRepo := repository.NewOrderRepoImpl(db)
 
 	// create api handlers
 	authHandler := api.NewAuthHandler(authRepo, cfg)
@@ -67,6 +68,7 @@ func main() {
 	productHandler := api.NewProductHandler(productRepo)
 	warrantyHandler := api.NewWarrantyHandler(warrantyRepo)
 	storeHandler := api.NewStoreHandler(storeRepo)
+	orderHandler := api.NewOrderHandler(orderRepo)
 
 	// create middlewares
 	authMiddleware := middleware.NewAuthMiddleware(cfg.JwtSecret)
@@ -171,6 +173,22 @@ func main() {
 		stores.Post("/addresses/:storeId/update", storeHandler.UpdateStoreAddresses)
 		stores.Post("/categories/:storeId/:categoryId/create", storeHandler.AddStoreCategory)
 		stores.Delete("/categories/:storeId/:categoryId/delete", storeHandler.DeleteStoreCategory)
+	}
+	orders := v2.Group("/orders", authMiddleware.Protected())
+	{
+		orders.Get("/check_payment_status/:orderId", orderHandler.IsUserPaidTheOrder)
+		orders.Post("/create", orderHandler.CreateOrder)
+		orders.Delete("/delete/:orderId", orderHandler.DeleteOrder)
+		orders.Post("/add_product/:orderId", orderHandler.AddProductToOrder)
+		orders.Delete("/remove_product/:orderId", orderHandler.RemoveProductFromOrder)
+		orders.Post("/update_quantity/:orderId", orderHandler.UpdateProductOrderQuantity)
+		orders.Get("/:orderId", orderHandler.GetAllProductsInTheOrder)
+		orders.Get("/me", orderHandler.GetAllOrdersByUserId)
+		orders.Post("/pay/:orderId", orderHandler.PayOrder)
+		orders.Post("/promotion_code/apply/:orderId", orderHandler.ApplyPromotionCodeToOrder)
+		orders.Delete("/promotion_code/delete/:orderId", orderHandler.DeletePromotionCodeFromOrder)
+		orders.Get("/shipping_methods", orderHandler.GetShippingMethod)
+		orders.Post("/shipping_methods/update/:orderId", orderHandler.UpdateShippingMethod)
 	}
 
 	log.Fatal(app.Listen(fmt.Sprintf(":%d", cfg.Port)))
