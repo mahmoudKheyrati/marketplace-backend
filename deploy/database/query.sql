@@ -232,6 +232,35 @@ where category_id in (
     from cte
 ) order by category_id;
 
+
+-- similar products
+with cte as (
+    select product.id,
+           category_id,
+           name,
+           brand,
+           description,
+           picture_url,
+           specification,
+           product.created_at,
+           sum(2*(case when v.up_vote = true then 1 else 0 end) + (case when v.down_vote = true then 1 else 0 end)) as sum
+    from product
+             left join review r on product.id = r.product_id left join votes v on r.id = v.review_id
+    where category_id = ?
+    group by product.id, category_id, name, brand, description, picture_url, specification, product.created_at
+)select id,
+        category_id,
+        name,
+        brand,
+        description,
+        picture_url,
+        specification,
+        created_at
+from cte order by sum desc limit 10;
+
+
+
+
 -- get distinct brand by categoryId
 select distinct brand from product where category_id = ?;
 

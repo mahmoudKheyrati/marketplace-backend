@@ -11,6 +11,7 @@ type ProductRepo interface {
 	GetProductsByCategoryId(ctx context.Context, categoryId int64) ([]model.Product, error)
 	GetAllStoreProductsByProductId(ctx context.Context, productId int64) ([]model.StoreProduct, error) // product available in the stores
 
+	GetSimilarProducts(ctx context.Context, productId int64) ([]model.Product, error)
 	GetBrandsByCategoryId(ctx context.Context, categoryId int64) ([]string, error)
 	GetPriceRangeByCategoryId(ctx context.Context, categoryId int64) (float64, float64, error)
 	GetSpecificationsByCategoryId(ctx context.Context, categoryId int64) ([]string, error)
@@ -137,6 +138,54 @@ where product_id = $1
 		storeProducts = append(storeProducts, storeProduct)
 	}
 	return storeProducts, nil
+}
+
+func (p *ProductRepoImpl) GetSimilarProducts(ctx context.Context, productId int64) ([]model.Product, error) {
+	product, err := p.GetProductByProductId(ctx, productId)
+	if err != nil {
+		return nil, err
+	}
+
+	query := `
+with cte as (
+    select product.id,
+           category_id,
+           name,
+           brand,
+           description,
+           picture_url,
+           specification,
+           product.created_at,
+           sum(2*(case when v.up_vote = true then 1 else 0 end) + (case when v.down_vote = true then 1 else 0 end)) as sum
+    from product
+             left join review r on product.id = r.product_id left join votes v on r.id = v.review_id
+    where category_id = $1
+    group by product.id, category_id, name, brand, description, picture_url, specification, product.created_at
+)select id,
+        category_id,
+        name,
+        brand,
+        description,
+        picture_url,
+        specification,
+        created_at
+from cte order by sum desc limit 10;
+`
+	rows, err := p.db.Query(ctx, query, product.CategoryId)
+	if err != nil {
+		return nil, err
+	}
+	var products = make([]model.Product, 0)
+	for rows.Next() {
+		var product model.Product
+		err := rows.Scan(&product.Id, &product.CategoryId, &product.Name, &product.Brand, &product.Description, &product.PictureUrl,
+			&product.Specification, &product.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		products = append(products, product)
+	}
+	return products, nil
 }
 
 func (p *ProductRepoImpl) GetBrandsByCategoryId(ctx context.Context, categoryId int64) ([]string, error) {

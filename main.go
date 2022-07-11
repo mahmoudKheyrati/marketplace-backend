@@ -145,6 +145,7 @@ func main() {
 	products := v2.Group("/products")
 	{
 		products.Get("/:productId", productHandler.GetProductByProductId)
+		products.Get("/similar/:productId", productHandler.GetSimilarProducts)
 		products.Get("/category/:categoryId", productHandler.GetProductsByCategoryId)
 		products.Get("/stores/:productId", productHandler.GetAllStoreProductsByProductId)
 		products.Get("/brands/:categoryId", productHandler.GetBrandsByCategoryId)
