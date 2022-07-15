@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: marketplace
+  namespace: business
+spec:
+  selector:
+    matchLabels:
+      app: marketplace
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: marketplace
+        service_monitoring: business
+    spec:
+      containers:
+        - name: marketplace
+          image: { _version }
+          envFrom:
+            - configMapRef:
+                name: marketplace-config
+            - secretRef:
+                name: marketplace-secret
+          ports:
+            - containerPort: 4040
+      imagePullSecrets:
+        - name: docker-bale-ai
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: marketplace-service
+  namespace: business
+spec:
+  type: ClusterIP
+  ports:
+    - name: marketplace-http
+      port: 4040
+      targetPort: 4040
+  selector:
+    app: marketplace
