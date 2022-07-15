@@ -80,7 +80,7 @@ from address
 where user_id = $1
   and is_last_version = true;
 `
-	rows, err := a.db.Query(ctx, query, 1)
+	rows, err := a.db.Query(ctx, query, userId)
 	if err != nil {
 		return nil, err
 	}
