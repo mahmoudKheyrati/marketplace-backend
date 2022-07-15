@@ -375,6 +375,65 @@ select id,
 from product
 where category_id = ?
 order by created_at desc;
+
+-- =========================== search ===================================
+-- with search_result as (
+--     select id,
+--            category_id,
+--            name,
+--            brand,
+--            description,
+--            picture_url,
+--            specification,
+--            product.created_at as created_at
+--     from product
+--
+--     where (name ilike '%$1%' or brand ilike '%$1%' or category_id in (
+--         with recursive cte as (
+--             select id, name, parent
+--             from category
+--             where name ilike '%$1%'
+--             union
+--             select c2.id, c2.name, c2.parent
+--             from category c2
+--                      join cte as c1 on c2.parent = c1.id
+--         ) select cte.id from cte))
+--       -- filter queries
+--         except
+--     select id,
+--            category_id,
+--            name,
+--            brand,
+--            description,
+--            picture_url,
+--            specification,
+--            created_at
+--     from product
+--     where brand != $4
+--         except
+--     select id,
+--            category_id,
+--            name,
+--            brand,
+--            description,
+--            picture_url,
+--            specification,
+--            created_at
+--     from product where specification::jsonb ->> ? != ?
+-- ) select * from search_result sr left join store_product sp on sr.id = sp.product_id
+-- where price between $5 and $6
+-- order by (case
+--     when $7 = 'byDate' then sr.created_at
+--     when $7 = 'byCheapest' then sp.price
+--     when $7 = 'byExpensive' then sp.price
+--     when $7 = 'byReviewCount' then 1
+--     end) ;
+
+
+-- =========================== filter ===================================
+
+
+
 -- get product by product_id
 select id,
        category_id,
@@ -559,6 +618,20 @@ update "order" set shipping_method_id = ? where id= ? and user_id = ? ;
 -- create new order
 insert into "order"(user_id )
 values (?) returning id;
+-- get order by order_id
+select id,
+       status,
+       tracking_code,
+       user_id,
+       address_id,
+       shipping_method_id,
+       applied_promotion_code,
+       payed_price,
+       is_paid,
+       pay_date,
+       created_at,
+       deleted_at
+from "order" where user_id = ? and id = ? ;
 -- check user owns the order
 select exists(select 1 from order where id = ? and user_id= ? );
 -- check if order not deleted
