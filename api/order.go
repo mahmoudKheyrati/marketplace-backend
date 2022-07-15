@@ -86,13 +86,10 @@ func (o *OrderHandler) RemoveProductFromOrder(c *fiber.Ctx) error {
 
 	userId := c.Locals(pkg.UserIdKey).(int64)
 	orderId := cast.ToInt64(c.Params("orderId"))
+	storeId := cast.ToInt64(c.Params("storeId"))
+	productId := cast.ToInt64(c.Params("productId"))
 
-	var request ProductOrderRequest
-	if err := c.BodyParser(&request); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "error in parsing request body"})
-	}
-
-	err := o.orderRepo.RemoveProductFromOrder(ctx, userId, orderId, request.ProductId, request.StoreId)
+	err := o.orderRepo.RemoveProductFromOrder(ctx, userId, orderId, productId, storeId)
 	if err != nil {
 		pkg.Logger().Error(err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "can not get "})

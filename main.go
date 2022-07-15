@@ -182,7 +182,7 @@ func main() {
 		orders.Post("/create", orderHandler.CreateOrder)
 		orders.Delete("/delete/:orderId", orderHandler.DeleteOrder)
 		orders.Post("/add_product/:orderId", orderHandler.AddProductToOrder)
-		orders.Delete("/remove_product/:orderId", orderHandler.RemoveProductFromOrder)
+		orders.Delete("/remove_product/:orderId/:storeId/:productId", orderHandler.RemoveProductFromOrder)
 		orders.Post("/update_quantity/:orderId", orderHandler.UpdateProductOrderQuantity)
 		orders.Get("/:orderId", orderHandler.GetAllProductsInTheOrder)
 		orders.Get("/me", orderHandler.GetAllOrdersByUserId)
