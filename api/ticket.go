@@ -6,6 +6,7 @@ import (
 	"github.com/mahmoudKheyrati/marketplace-backend/internal/repository"
 	"github.com/mahmoudKheyrati/marketplace-backend/pkg"
 	"github.com/spf13/cast"
+	"time"
 )
 
 type TicketHandler struct {
@@ -71,6 +72,13 @@ func (t *TicketHandler) CreateTicket(c *fiber.Ctx) error {
 type SendMessageToTicketRequest struct {
 	Text string `json:"text"`
 }
+type SendMessageToTicketResponse struct {
+	TicketId    int64     `json:"ticket_id"`
+	SenderId    int64     `json:"sender_id"`
+	MessageText string    `json:"message_text"`
+	Status      string    `json:"status"`
+	CreatedAt   time.Time `json:"created_at"`
+}
 
 func (t *TicketHandler) SendMessageToTicket(c *fiber.Ctx) error {
 	ctx := context.Background()
@@ -88,7 +96,15 @@ func (t *TicketHandler) SendMessageToTicket(c *fiber.Ctx) error {
 		pkg.Logger().Error(err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "can not send message to ticket"})
 	}
-	return c.JSON(fiber.Map{"status": "ok"})
+	return c.JSON(
+		fiber.Map{"message": SendMessageToTicketResponse{
+			TicketId:    ticketId,
+			SenderId:    userId,
+			MessageText: request.Text,
+			Status:      "sent",
+			CreatedAt:   time.Now(),
+		},
+			"status": "ok"})
 }
 
 func (t *TicketHandler) LoadTicketMessages(c *fiber.Ctx) error {
