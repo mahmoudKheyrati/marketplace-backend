@@ -164,7 +164,8 @@ create table store_product
     warranty_id     bigint references warranty (id) on delete set null on update cascade,
     created_at      timestamptz               default now(),
     is_last_version bool                      default true,
-    unique (product_id, store_id)
+    unique (product_id, store_id),
+    check ( available_count >= 0 )
 );
 
 -- drop table if exists product_category;
