@@ -16,12 +16,25 @@ func NewNotificationHandler(notificationRepo repository.NotificationRepo) *Notif
 	return &NotificationHandler{notificationRepo: notificationRepo}
 }
 
-func (n *NotificationHandler) SubscribeToProduct(c *fiber.Ctx) error {
+func (n *NotificationHandler) SubscribeToProductNotification(c *fiber.Ctx) error {
 	ctx := context.Background()
 	userId := c.Locals(pkg.UserIdKey).(int64)
 	productId := cast.ToInt64(c.Params("productId"))
 
 	err := n.notificationRepo.Subscribe(ctx, productId, userId)
+	if err != nil {
+		pkg.Logger().Error(err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "failed to subscribe on product's available notification"})
+	}
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"status": "ok"})
+}
+
+func (n *NotificationHandler) UnSubscribeToProductNotification(c *fiber.Ctx) error {
+	ctx := context.Background()
+	userId := c.Locals(pkg.UserIdKey).(int64)
+	productId := cast.ToInt64(c.Params("productId"))
+
+	err := n.notificationRepo.UnSubscribe(ctx, productId, userId)
 	if err != nil {
 		pkg.Logger().Error(err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "failed to subscribe on product's available notification"})

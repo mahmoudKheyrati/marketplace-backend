@@ -9,6 +9,7 @@ type NotificationRepo interface {
 	GetAvailableNotifications(ctx context.Context, userId int64) ([]int64, error)
 	GetPendingNotifications(ctx context.Context, userId int64) ([]int64, error)
 	Subscribe(ctx context.Context, productId, userId int64) error
+	UnSubscribe(ctx context.Context, productId, userId int64) error
 	MarkNotificationAsSeen(ctx context.Context, userId int64, notificationId int64) error
 }
 type NotificationRepoImpl struct {
@@ -67,6 +68,13 @@ where user_id = $1
 func (n *NotificationRepoImpl) Subscribe(ctx context.Context, productId, userId int64) error {
 	query := `insert into product_available_subscription(product_id, user_id)
 values ($1, $2)`
+
+	_, err := n.db.Query(ctx, query, productId, userId)
+	return err
+}
+
+func (n *NotificationRepoImpl) UnSubscribe(ctx context.Context, productId, userId int64) error {
+	query := `delete from product_available_subscription where product_id = $1 and user_id = $2 and is_notification_sent = false`
 
 	_, err := n.db.Query(ctx, query, productId, userId)
 	return err

@@ -93,7 +93,8 @@ func main() {
 	{
 		notification.Get("/", notificationHandler.GetAvailableNotifications)
 		notification.Get("/pending", notificationHandler.GetPendingNotifications)
-		notification.Post("/subscribe/:productId", notificationHandler.SubscribeToProduct)
+		notification.Post("/subscribe/:productId", notificationHandler.SubscribeToProductNotification)
+		notification.Delete("/unsubscribe/:productId", notificationHandler.UnSubscribeToProductNotification)
 		notification.Post("/seen/:productId", notificationHandler.SeenNotification)
 	}
 
