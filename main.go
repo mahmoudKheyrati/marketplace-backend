@@ -18,6 +18,18 @@ import (
 	"log"
 )
 
+type PriceRange struct {
+	Min float64
+	Max float64
+}
+type SearchQuery struct {
+	Query            string
+	SortBy           string
+	BrandFilter      *string
+	PriceRangeFilter *PriceRange
+	KeyValues        map[string]string
+}
+
 func main() {
 	//ctx := context.Background()
 	zapLogger := pkg.Logger()
@@ -186,7 +198,8 @@ func main() {
 		orders.Delete("/remove_product/:orderId/:storeId/:productId", orderHandler.RemoveProductFromOrder)
 		orders.Post("/update_quantity/:orderId", orderHandler.UpdateProductOrderQuantity)
 		orders.Get("/me", orderHandler.GetAllOrdersByUserId)
-		orders.Get("/:orderId", orderHandler.GetAllProductsInTheOrder)
+		orders.Get("/:orderId", orderHandler.GetOrderByOrderId)
+		orders.Get("/products/:orderId", orderHandler.GetAllProductsInTheOrder)
 		orders.Post("/pay/:orderId", orderHandler.PayOrder)
 		orders.Post("/promotion_code/apply/:orderId", orderHandler.ApplyPromotionCodeToOrder)
 		orders.Delete("/promotion_code/delete/:orderId", orderHandler.DeletePromotionCodeFromOrder)

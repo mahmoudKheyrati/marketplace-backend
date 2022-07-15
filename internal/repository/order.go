@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/mahmoudKheyrati/marketplace-backend/internal/model"
 )
@@ -13,6 +14,7 @@ type OrderRepo interface {
 	IsUserOwnsTheOrder(ctx context.Context, userId, orderId int64) (bool, error)
 
 	CreateOrder(ctx context.Context, userId int64) (int64, error)
+	GetOrderByOrderId(ctx context.Context, userId, orderId int64) (*model.Order, error)
 	DeleteOrder(ctx context.Context, userId, orderId int64) error
 
 	AddProductToOrder(ctx context.Context, userId, orderId, productId, storeId int64) error
@@ -107,6 +109,32 @@ values ($1) returning id;
 	var orderId int64 = -1
 	err := row.Scan(&orderId)
 	return orderId, err
+}
+
+func (o *OrderRepoImpl) GetOrderByOrderId(ctx context.Context, userId, orderId int64) (*model.Order, error) {
+	err := o.mustOrderInProgress(ctx, userId, orderId)
+	if err != nil {
+		return nil, err
+	}
+	query := `
+select id,
+       status,
+       tracking_code,
+       user_id,
+       address_id,
+       shipping_method_id,
+       applied_promotion_code,
+       payed_price,
+       is_paid,
+       pay_date,
+       created_at
+from "order" where user_id = $1 and id = $2 ;
+`
+	row := o.db.QueryRow(ctx, query, userId, orderId)
+	var order model.Order
+	err = row.Scan(&order.Id, &order.Status, &order.TrackingCode, &order.UserId, &order.AddressId, &order.ShippingMethodId, &order.AppliedPromotionCode,
+		&order.PayedPrice, &order.IsPaid, &order.PayDate, &order.CreatedAt)
+	return &order, err
 }
 
 func (o *OrderRepoImpl) DeleteOrder(ctx context.Context, userId, orderId int64) error {
@@ -232,6 +260,17 @@ func (o *OrderRepoImpl) PayOrder(ctx context.Context, userId, orderId int64, pay
 	if err != nil {
 		return err
 	}
+
+	err = o.db.BeginTxFunc(ctx, pgx.TxOptions{
+		IsoLevel:       pgx.Serializable,
+		AccessMode:     pgx.ReadWrite,
+		DeferrableMode: pgx.Deferrable,
+	}, func(tx pgx.Tx) error {
+
+		//o.getor
+
+		return nil
+	})
 
 	query := `
 update "order"

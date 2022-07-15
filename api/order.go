@@ -42,6 +42,19 @@ func (o *OrderHandler) CreateOrder(c *fiber.Ctx) error {
 	}
 	return c.JSON(fiber.Map{"order_id": orderId, "status": "ok"})
 }
+func (o *OrderHandler) GetOrderByOrderId(c *fiber.Ctx) error {
+	ctx := context.Background()
+
+	userId := c.Locals(pkg.UserIdKey).(int64)
+	orderId := cast.ToInt64(c.Params("orderId"))
+
+	order, err := o.orderRepo.GetOrderByOrderId(ctx, userId, orderId)
+	if err != nil {
+		pkg.Logger().Error(err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "can not get "})
+	}
+	return c.JSON(fiber.Map{"order": order, "status": "ok"})
+}
 
 func (o *OrderHandler) DeleteOrder(c *fiber.Ctx) error {
 	ctx := context.Background()
