@@ -266,13 +266,26 @@ func (o *OrderRepoImpl) PayOrder(ctx context.Context, userId, orderId int64, pay
 		AccessMode:     pgx.ReadWrite,
 		DeferrableMode: pgx.Deferrable,
 	}, func(tx pgx.Tx) error {
+		orderProducts, err := o.GetAllProductsInTheOrder(ctx, userId, orderId)
+		if err != nil {
+			return err
+		}
+		for _, orderProduct := range orderProducts {
+			// check availability
+			updateQuery := `
+update product_order
+set quantity = quantity - $4
+where order_id = $1
+  and product_id = $2
+  and store_id = $3;
+`
+			_, err := tx.Exec(ctx, updateQuery, orderProduct.OrderId, orderProduct.ProductId, orderProduct.StoreId, orderProduct.Quantity)
+			if err != nil {
+				return err
+			}
+		}
 
-		//o.getor
-
-		return nil
-	})
-
-	query := `
+		query := `
 update "order"
 set is_paid = true,
     status='confirmed',
@@ -281,7 +294,10 @@ set is_paid = true,
 where id = $2
   and user_id = $3;
 `
-	_, err = o.db.Exec(ctx, query, payedPrice, orderId, userId)
+		_, err = o.db.Exec(ctx, query, payedPrice, orderId, userId)
+
+		return nil
+	})
 	return err
 }
 
