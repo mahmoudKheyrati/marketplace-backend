@@ -63,7 +63,7 @@ select deleted_at is not null from "order" where id= $1 and user_id = $2
 
 func (o *OrderRepoImpl) IsUserOwnsTheOrder(ctx context.Context, userId, orderId int64) (bool, error) {
 	query := `
-select exists(select 1 from order where id = $1 and user_id= $2 )
+select exists(select 1 from "order" where id = $1 and user_id= $2 )
 `
 	row := o.db.QueryRow(ctx, query, orderId, userId)
 	var isUserOwnsTheOrder bool
@@ -184,7 +184,7 @@ where order_id = $1
 	var orderProducts = make([]model.OrderProduct, 0)
 	for rows.Next() {
 		var orderProduct model.OrderProduct
-		err := rows.Scan(&orderProduct.ProductId, &orderProduct.StoreId, &orderProduct.Quantity, &orderProduct.CreatedAt)
+		err := rows.Scan(&orderProduct.ProductId, &orderProduct.StoreId, &orderProduct.OrderId, &orderProduct.Quantity, &orderProduct.CreatedAt)
 		if err != nil {
 			return nil, err
 		}
