@@ -97,7 +97,9 @@ func (p *ProductHandler) GetPriceRangeByCategoryId(c *fiber.Ctx) error {
 		pkg.Logger().Error(err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "can not get price range by categoryId"})
 	}
-	return c.JSON(fiber.Map{"min": min, "max": max, "status": "ok"})
+	return c.JSON(fiber.Map{"price_range": fiber.Map{
+		"min": min, "max": max,
+	}, "status": "ok"})
 }
 
 func (p *ProductHandler) GetSpecificationsByCategoryId(c *fiber.Ctx) error {

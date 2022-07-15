@@ -266,8 +266,16 @@ select min(sp.price) as min, max(sp.price) as max from store_product sp join pro
 where p.category_id = $1
 `
 	row := p.db.QueryRow(ctx, query, categoryId)
+	var minPointer, maxPointer *float64
+	err := row.Scan(&minPointer, &maxPointer)
 	var min, max float64
-	err := row.Scan(&min, &max)
+	if minPointer != nil {
+		min = *minPointer
+	}
+	if maxPointer != nil {
+		max = *maxPointer
+	}
+
 	return min, max, err
 }
 
