@@ -26,14 +26,10 @@ func (a *AddressRepoImpl) CreateAddress(ctx context.Context, userId int64, count
 	query := `insert into address(user_id, country, province, city, street, postal_code, home_phone_number)
 values ($1, $2, $3, $4, $5, $6, $7) returning id`
 
-	rows, err := a.db.Query(ctx, query, userId, country, province, city, street, postalCode, homePhoneNumber)
-	if err != nil {
-		return -1, err
-	}
+	rows := a.db.QueryRow(ctx, query, userId, country, province, city, street, postalCode, homePhoneNumber)
 
-	rows.Next()
 	var id int64 = -1
-	err = rows.Scan(&id)
+	err := rows.Scan(&id)
 	return id, err
 }
 
